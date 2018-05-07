@@ -1,0 +1,62 @@
+<html>
+
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link rel="stylesheet" href="/mapeditor/css/theme.css">
+    </head>
+    
+    <body>
+        <wrap>
+            
+            <toolbar>
+                <div id="systemToolbar">
+                    <span>File</span>
+                    <span>Edit</span>
+                    <span>View</span>
+                    <span>Map</span>
+                    <span>Layer</span>
+                    <span>Help</span>
+                </div>
+                <div id="mapToolbar">
+                    <span class="newMap toolIcon"></span>
+                    <span class="openMap toolIcon"></span>
+                    <span class="saveMap toolIcon"></span>
+                    <span class="divider"></span>
+                    <span id="stampTool" class="stampMap toolIcon"></span>
+                    <span id="eraseTool" class="eraserMap toolIcon"></span>
+                </div>
+            </toolbar>
+            
+            <main>
+                <div class="popTool">
+                    <div style="width: 150px;" class="toolContent">
+                        <header>Layers</header>
+                        <ul id="tileLayers"></ul>
+                    </div>
+                </div>
+                
+                <div style="position: relative;" id="mapArea">
+                    <canvas id="bggrid"></canvas>
+                    <span id="stamp">
+                        <canvas></canvas>
+                    </span>
+                </div>
+
+                <div class="popTool">
+                    <div style="width: 270px;" class="toolContent">
+                        <header>Tilesets</header>
+                        <div id="tileSetTabs"></div>
+                        <div id="tileSetSheets">
+                            <canvas id="hightLight"></canvas>
+                        </div>
+                        <div id="tileSheetConBorder"></div>
+                    </div>
+                </div>
+            </main>
+        
+        </wrap>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/mapeditor/js/client.js"></script>
+    </body>
+
+</html>

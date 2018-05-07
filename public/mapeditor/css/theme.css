@@ -1,0 +1,170 @@
+/*
+ 
+COLORS
+#fff, #eee, #ccc, #ddd, #aaa, #999, #888
+
+*/
+
+body {
+    margin: 0px;
+    font-family: Roboto;
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -ms-user-select: none; /* IE10+ */
+}
+
+wrap {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#systemToolbar {
+    background-color: #eee;
+    padding: 1px;
+    border-bottom: 1px solid #ccc;
+    font-size: small;
+    cursor: default;
+}
+
+#systemToolbar span {
+    padding: 2px 4px 2px 4px;
+    display: inline-block;
+}
+
+toolBar span:hover {
+    background-color: #82b1ff;
+}
+
+#mapToolbar {
+    background-color: #ddd;
+    padding: 3px;
+}
+
+#stamp {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+#stamp canvas{
+    position: unset !important;
+}
+
+/*tool icons*/
+
+.toolIcon {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-image: url(../img/MapEditorTools.png);
+}
+
+.divider {
+    display: inline-block;
+    border-left: 1px solid #aaa;
+    height: 30px;
+}
+
+.newMap {
+    background-position: -1px -97px; 
+}
+
+.openMap {
+    background-position: -34px -33px; 
+}
+
+.saveMap {
+    background-position: -1px -33px;
+}
+
+.stampMap {
+    background-position: -1px -1px;
+}
+
+.eraserMap {
+    background-position: -66px -1px;
+}
+
+toolbar span {
+    margin-left: 15px;
+}
+
+main {
+    display: flex;
+    height: 100%;
+}
+
+main header {
+    background-color: #aaa;
+    padding: 3px;
+    font-size: small;
+}
+
+.popTool {
+    display: flex;
+    background-color: #ddd;
+    padding: 0px 5px 5px 5px;
+}
+
+.toolContent {
+    display: flex;
+    flex-direction: column;
+}
+
+#tileLayers {
+    list-style-type: none;
+    padding: 0px;
+}
+
+#tileLayers li {
+    text-align: center;
+    border: 1px solid #999;
+    background-color: #aaa;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+#tileLayers .selected {
+    background-color: white;
+}
+
+#mapArea {
+    flex: 1;
+    background-color: #888;
+    overflow: scroll;
+}
+
+#mapArea canvas {
+    position: absolute;
+}
+
+#tileSetTabs {
+    padding-top: 10px;
+}
+
+#tileSetTabs span {
+    border: 1px solid #999;
+    padding: 1px 20px 1px 20px;
+    background-color: #ccc;
+    font-size: small;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#tileSetTabs .selectedTab {
+    background-color: #fff;
+    padding-top: 3px;
+}
+
+#tileSetSheets {
+    position: relative;
+    overflow: scroll;
+    flex: 1;
+}
+
+#hightLight {
+    position: absolute;
+}
