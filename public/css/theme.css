@@ -1,6 +1,7 @@
 body {
     margin: 0px;
     background-color: black;
+    font-family: 'Roboto', sans-serif;
 }
 
 main {
@@ -34,6 +35,23 @@ main canvas {
 
 #message-container {
     flex: 1;
+    padding: 10px;
+}
+
+.message {
+    color: white;
+}
+
+.message div {
+    display: inline;
+}
+
+.time {
+    font-size: 14px;
+}
+
+.nick {
+    color: #39f;
 }
 
 #input-container {
@@ -48,3 +66,4 @@ main canvas {
     padding: 5px;
     width: 100%;
 }
+
