@@ -1,0 +1,50 @@
+body {
+    margin: 0px;
+    background-color: black;
+}
+
+main {
+    position: relative;
+}
+
+main canvas {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+/*
+
+ CHAT BOX
+
+*/
+
+#chatbox {
+    background-color: #333;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 200px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    z-index: 1;
+}
+
+#message-container {
+    flex: 1;
+}
+
+#input-container {
+    padding: 10px;
+}
+
+#input-container input {
+    background-color: #222;
+    border: 1px solid #111;
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    width: 100%;
+}

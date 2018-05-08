@@ -119,9 +119,34 @@ players.deterDir = function (player) {
 
 players.drawPlayer = function (player) {
     if (player) {
-        let avyInfo = player.avatarInfo;
+        let avyInfo = player.avatarInfo,
+            xPos = player.x * 2,
+            yPos = player.y * 2;
         
-        world.layers[1].ctx.drawImage(defualtAvy, avyInfo.width * avyInfo.frameX, avyInfo.height * avyInfo.frameY, avyInfo.width, avyInfo.height,  (player.x * 2) + world.view.x, (player.y * 2) + world.view.y, avyInfo.width, avyInfo.height);   
+        if (player.id === players.heroId) {
+            let viewX = 0,
+                viewY = 0;
+
+            if (xPos > world.view.screenWidth / 2) {
+                viewX = -(xPos - (world.view.screenWidth / 2));
+                xPos = Math.floor(world.view.screenWidth / 2);
+            }
+            
+            if (yPos > world.view.screenHeight / 2) {
+                viewY = -(yPos - (world.view.screenHeight / 2));
+                yPos = Math.floor(world.view.screenHeight / 2);
+            }
+            
+            if (viewX || viewY) world.setView(viewX, viewY);
+        }
+        
+        world.layers[1].ctx.drawImage(defualtAvy, avyInfo.width * avyInfo.frameX, avyInfo.height * avyInfo.frameY, avyInfo.width, avyInfo.height,  xPos, yPos, avyInfo.width, avyInfo.height);  
+    }
+}
+
+players.redrawAllPlayers = function () {
+    for (let player of players.online) {
+        players.drawPlayer(player);
     }
 }
 

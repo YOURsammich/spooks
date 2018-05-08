@@ -1,5 +1,5 @@
 function gameLoop () {
-    world.layers[1].ctx.clearRect(0, 0, world.layers[1].canvas.width, world.layers[1].canvas.height);
+    world.layers[1].ctx.clearRect(0, 0, world.view.screenWidth, world.view.screenHeight);
     
     //sort drawing order so players with a higher y value are drawn last
     players.online.sort(function (a, b) {
@@ -8,11 +8,10 @@ function gameLoop () {
     
     for (let player of players.online) {
         
-        if (player.id !== players.heroId) {
+        if (player.id === players.heroId) {
             players.deterDir(player);
         }
         
-        //world.moveViewBy(.1, 0)
         players.updatePos(player);
         players.drawPlayer(player);
     }

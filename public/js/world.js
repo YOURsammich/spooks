@@ -13,7 +13,21 @@ var world = {
     }
 }
 
-world.drawMap = function () {
+world.reDrawBg = function () {
+    let view = world.view,
+        xPos = Math.abs(view.x),
+        yPos = Math.abs(view.y);
+    
+    world.layers[0].ctx.clearRect(0, 0, view.screenWidth, view.screenHeight);
+    world.layers[0].ctx.drawImage(world.background, xPos, yPos, view.screenWidth, view.screenHeight, 0, 0, view.screenWidth, view.screenHeight);
+}
+
+world.createMapBackground = function () {
+    let tempCanvas = document.createElement('canvas'),
+        ctx = tempCanvas.getContext('2d');
+    
+    tempCanvas.width = tempCanvas.height = 2000;
+    
     for (let layer of world.tiles) {
         let tileSheetKeys = Object.keys(layer);
         
@@ -22,10 +36,13 @@ world.drawMap = function () {
                 tileData = layer[tileSheet];
             
             for (let tile of tileData) {
-                world.layers[0].ctx.drawImage(tileSheetImg, tile[2] * 16, tile[3] * 16, 16, 16, tile[0] + world.view.x, tile[1] + world.view.y, 16, 16);
+                ctx.drawImage(tileSheetImg, tile[2] * 16, tile[3] * 16, 16, 16, tile[0] + world.view.x, tile[1] + world.view.y, 16, 16);
             }
         }
     }
+    
+    world.background.onload = world.reDrawBg;
+    world.background.src = tempCanvas.toDataURL();
 }
 
 world.addTilesheet = function (url) {
@@ -59,17 +76,6 @@ world.addLayer = function (name) {
     document.getElementsByTagName('main')[0].appendChild(canvas);
 }
 
-world.setBackground = function (tiles) {
-    let canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d');
-    
-    canvas.width = 2000;
-    canvas.height = 2000;
-    
-    world.background.src = canvas.toDataURL();
-    world.drawMap();
-}
-
 world.reSizeWorld = function (width, height) {
     let canvases = document.getElementsByTagName('canvas');
     
@@ -78,16 +84,16 @@ world.reSizeWorld = function (width, height) {
         canvas.height = world.screenHeight = height;
     }
     
-    world.drawMap();
+    players.redrawAllPlayers();
+    world.reDrawBg();
 }
 
-world.moveViewBy = function (x, y) {
+world.setView = function (x, y) {
     let view = world.view;
-    view.x += x;
-    view.y += y;
+    view.x = x;
+    view.y = y;
     
-    world.layers[0].ctx.clearRect(0, 0, view.screenWidth, view.screenHeight);
-    world.drawMap();
+    world.reDrawBg();
 }
 
 window.addEventListener('resize', function () {
@@ -102,7 +108,7 @@ world.addLayer('playerLayer');
 socket.on('mapData', function (mapData) {
     if (mapData && mapData.tiles) {
         world.tiles = JSON.parse(mapData.tiles);
-        world.drawMap(world.tiles);
+        world.createMapBackground(world.tiles);
     }
 });
 
