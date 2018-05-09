@@ -24,7 +24,7 @@ function initServer (io) {
     var channelName = '';
     
     var players = [];
-    
+        
     //send all players positions out 
     setInterval(function () {
         io.emit('playerPos', players);
@@ -77,6 +77,12 @@ function initServer (io) {
                 players[index].x = x;
                 players[index].y = y;
             }
+        });
+        
+        socket.on('message', function (nick, message) {
+            
+            io.emit('message', nick, message);
+            
         });
         
         socket.on('disconnect', function () {

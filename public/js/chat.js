@@ -49,12 +49,16 @@ messager.showMessage = function (nick, message) {
     messager.scrollToBottom(messageEl.offsetHeight);
 }
 
+socket.on('message', function (nick, message) {
+    messager.showMessage(nick, message);
+});
+
 
 document.getElementById('main-input').addEventListener('keydown', function (e) {
     var keyCode = e.which;
     
     if (keyCode === 13) {
-        messager.showMessage('sammich', this.value);
+        socket.emit('message', 'sammich', this.value);
         this.value = '';
     }
 });
