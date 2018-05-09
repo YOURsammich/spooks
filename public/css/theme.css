@@ -23,6 +23,7 @@ main canvas {
 #chatbox {
     background-color: #333;
     border-radius: 5px;
+    cursor: move;
     display: flex;
     flex-direction: column;
     height: 200px;
@@ -35,7 +36,8 @@ main canvas {
 
 #message-container {
     flex: 1;
-    padding: 10px;
+    margin: 10px;
+    overflow-y: auto;
 }
 
 .message {
@@ -47,11 +49,16 @@ main canvas {
 }
 
 .time {
+    color: grey;
     font-size: 14px;
 }
 
 .nick {
     color: #39f;
+}
+
+.message-content {
+    word-wrap: break-word;
 }
 
 #input-container {
