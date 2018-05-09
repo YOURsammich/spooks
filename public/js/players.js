@@ -101,6 +101,19 @@ players.updatePos = function (player) {
         }
         
         if (player.id === players.heroId) { // send YOUR coords to the server
+            let viewX = 0,
+                viewY = 0;
+            
+            if (player.x * 2 > world.view.screenWidth / 2) {
+                viewX = -((player.x * 2) - (world.view.screenWidth / 2));
+            }
+            
+            if (player.y * 2 > world.view.screenHeight / 2) {
+                viewY = -((player.y * 2) - (world.view.screenHeight / 2));
+            }
+            
+            if (viewX || viewY) world.setView(viewX, viewY);
+            
             socket.emit('updatePos', player.x, player.y);
         }
     }
@@ -124,20 +137,16 @@ players.drawPlayer = function (player) {
             yPos = player.y * 2;
         
         if (player.id === players.heroId) {
-            let viewX = 0,
-                viewY = 0;
-
             if (xPos > world.view.screenWidth / 2) {
-                viewX = -(xPos - (world.view.screenWidth / 2));
                 xPos = Math.floor(world.view.screenWidth / 2);
             }
             
             if (yPos > world.view.screenHeight / 2) {
-                viewY = -(yPos - (world.view.screenHeight / 2));
                 yPos = Math.floor(world.view.screenHeight / 2);
             }
-            
-            if (viewX || viewY) world.setView(viewX, viewY);
+        } else {
+            xPos += world.view.x;
+            yPos += world.view.y;
         }
         
         world.layers[1].ctx.drawImage(defualtAvy, avyInfo.width * avyInfo.frameX, avyInfo.height * avyInfo.frameY, avyInfo.width, avyInfo.height,  xPos, yPos, avyInfo.width, avyInfo.height);  
@@ -145,6 +154,7 @@ players.drawPlayer = function (player) {
 }
 
 players.redrawAllPlayers = function () {
+    world.layers[1].ctx.clearRect(0, 0, world.view.screenWidth, world.view.screenHeight);
     for (let player of players.online) {
         players.drawPlayer(player);
     }

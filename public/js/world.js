@@ -13,7 +13,7 @@ var world = {
     }
 }
 
-world.reDrawBg = function () {
+world.redrawBg = function () {
     let view = world.view,
         xPos = Math.abs(view.x),
         yPos = Math.abs(view.y);
@@ -41,7 +41,7 @@ world.createMapBackground = function () {
         }
     }
     
-    world.background.onload = world.reDrawBg;
+    world.background.onload = world.redrawBg;
     world.background.src = tempCanvas.toDataURL();
 }
 
@@ -80,20 +80,20 @@ world.reSizeWorld = function (width, height) {
     let canvases = document.getElementsByTagName('canvas');
     
     for (let canvas of canvases) {
-        canvas.width = world.screenWidth = width;
-        canvas.height = world.screenHeight = height;
+        canvas.width = world.view.screenWidth = width;
+        canvas.height = world.view.screenHeight = height;
     }
     
     players.redrawAllPlayers();
-    world.reDrawBg();
+    world.redrawBg();
 }
 
 world.setView = function (x, y) {
-    let view = world.view;
-    view.x = x;
-    view.y = y;
+    let rX = Math.round(x),
+        rY = Math.round(y);
     
-    world.reDrawBg();
+    // change view on next iteration of gameLoop;
+    world.changeView = {rX, rY};
 }
 
 window.addEventListener('resize', function () {

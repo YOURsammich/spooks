@@ -32,10 +32,21 @@ messager.newMessage = function (nick, message) {
     return messageHTML.container;
 }
 
+messager.scrollToBottom = function (elHeight) {
+    let messageContainer = document.getElementById('message-container'),
+        totalScroll = messageContainer.scrollHeight - messageContainer.offsetHeight,
+        currentScroll = messageContainer.scrollTop;
+    
+    if (totalScroll - currentScroll <= elHeight) {
+        messageContainer.scrollTop = totalScroll;
+    }
+}
+
 messager.showMessage = function (nick, message) {
     let messageEl = messager.newMessage(nick, message);
     
     document.getElementById('message-container').appendChild(messageEl);
+    messager.scrollToBottom(messageEl.offsetHeight);
 }
 
 
