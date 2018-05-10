@@ -1,4 +1,4 @@
-var socket = io();
+var socket = io(window.location.pathname.substr(5));
 //Fisher Price
 //world object contains functions relating to the map itself
 var world = {
@@ -168,9 +168,10 @@ editTools.getCell = function (layer, X, Y) {
     var tilesFromLayer = world.tiles[layer],
         tileSheetKeys;
     
-    if (!tilesFromLayer) return;
+    if (!tilesFromLayer) return -1;
     
     tileSheetKeys = Object.keys(tilesFromLayer);
+    
     
     for (let t = 0; t < tileSheetKeys.length; t++) {
         for (let i = 0; i < tilesFromLayer[tileSheetKeys[t]].length; i++) {
@@ -246,21 +247,22 @@ editTools.stamp.groupPlace = function (startX, startY, minX, minY, maxX, maxY) {
     var moveX,
         moveY,
         tileSheet = editTools.stamp.activeTileSheet.canvas.id.substr(10),
-        buttsex = [];
+        saveHistory = [];
 
     for (moveX = 0; moveX < maxX; moveX++) {
         for (moveY = 0; moveY < maxY; moveY++) {
             let index = editTools.getCell(editTools.stamp.activeLayer, (startX + moveX) * 16, (startY + moveY) * 16);
             if (index !== -1) {
-                buttsex.push([editTools.stamp.activeLayer, index[0], world.tiles[editTools.stamp.activeLayer][index[0]][index[1]]]);   
+                if (!world.tiles[editTools.stamp.activeLayer]) console.log(world.tiles[editTools.stamp.activeLayer], index)
+                saveHistory.push([editTools.stamp.activeLayer, index[0], world.tiles[editTools.stamp.activeLayer][index[0]][index[1]]]);   
             } else {
-                buttsex.push([editTools.stamp.activeLayer, 'erase', (startX + moveX) * 16, (startY + moveY) * 16]);
+                saveHistory.push([editTools.stamp.activeLayer, 'erase', (startX + moveX) * 16, (startY + moveY) * 16]);
             }
             editTools.stamp.placeCell(editTools.stamp.activeLayer, tileSheet, startX + moveX, startY + moveY, minX + moveX, minY + moveY);
         }
     }
     
-    world.history.push(buttsex);
+    world.history.push(saveHistory);
 }
 
 editTools.stamp.spreadDisplay = function (newX, newY) {

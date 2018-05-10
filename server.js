@@ -56,7 +56,7 @@ function createChannel (io, channelName) {
         
         socket.on('getMap', function (mapName) {
             dao.getMap(channelName).then(function (mapData) {
-                socket.emit('mapData', mapData)
+                socket.emit('mapData', mapData);
             });
         });
         
@@ -110,11 +110,20 @@ function createChannel (io, channelName) {
 
 function intoapp (app, http) {
     var io = require('socket.io')(http),
-        channelRegex = /^\/(\w*\/?)$/;
+        channelRegex = /^\/(\w*\/?)$/,
+        editerRegex =/^\/edit\/(\w*\/?)$/;
     
     app.use(express.static(__dirname + '/public'));
     
-    app.get('/edit/*', function (req, res) {
+    app.get(editerRegex, function (req, res) {
+        var channelName = editerRegex.exec(req.url)[1].substr(4);
+        
+        if (!channelName) channelName = '/';
+        
+        if (!channels[channelName]) {
+            channels[channelName] = createChannel(io, channelName);
+        }
+        
         var index = fs.readFileSync('edit.html').toString();
         res.send(index);   
     });
