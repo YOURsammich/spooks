@@ -1,6 +1,7 @@
 var dao = require('./dao');
 var express = require('express');
 var fs = require('fs');
+var throttle = require('./throttle');
 
 var channels = {};
 
@@ -50,56 +51,75 @@ function createChannel (io, channelName) {
         const user = {
             remote_addr : socket.request.connection.remoteAddress,
             socket : socket,
-            id : makeId()
+            id : makeId(),
+            nick : 'anon'
         };
         
         console.log(channelName, 'user connected');
         
         socket.on('saveMap', function (mapData) {
-            if (typeof mapData == 'object') {
-                dao.saveMap(channelName, JSON.stringify(mapData)).then(function () {
-                    console.log('map saved'); 
-                });
-            }
+            throttle.on(user.remote_addr + 'saveMap').then(function () {
+                if (typeof mapData == 'object') {
+                    dao.saveMap(channelName, JSON.stringify(mapData)).then(function () {
+                        console.log('map saved'); 
+                    });
+                } 
+            }).fail(function () {
+                console.log('spam'); 
+            });
         });
         
         socket.on('getMap', function (mapName) {
-            dao.getMap(channelName).then(function (mapData) {
-                socket.emit('mapData', mapData);
+            throttle.on(user.remote_addr + 'getMap').then(function () {
+                dao.getMap(channelName).then(function (mapData) {
+                    socket.emit('mapData', mapData);
+                });
+            }).fail(function () {
+                console.log('spam'); 
             });
         });
         
         socket.on('requestJoin', function () {
-            socket.emit('youJoined', user.id);//tell yourself you joined
-            socket.emit('playerJoined', players);//get all current users
-            
-            socket.join('chat'); //join room necessarily for receiving data 
-            
-            roomEmit('playerJoined', [{
-                x : 0,
-                y : 0,
-                id : user.id
-            }]);//tell everyone you joined
-            
-            players.push({
-                x : 0,
-                y : 0,
-                id : user.id
-            })
+            throttle.on(user.remote_addr + 'join').then(function () {
+                socket.emit('youJoined', user.id);//tell yourself you joined
+                socket.emit('playerJoined', players);//get all current users
+
+                socket.join('chat'); //join room necessarily for receiving data 
+
+                roomEmit('playerJoined', [{
+                    x : 0,
+                    y : 0,
+                    id : user.id
+                }]);//tell everyone you joined
+
+                players.push({
+                    x : 0,
+                    y : 0,
+                    id : user.id
+                })
+            }).fail(function () {
+                console.log('spam'); 
+            });
         });
         
         socket.on('updatePos', function (x, y) {
-            const index = findIndex(players, 'id', user.id);
-            if (index !== -1) {
-                players[index].x = x;
-                players[index].y = y;
-            }
+            throttle.on(user.id + 'updatePos', 1000, 40).then(function () {
+                const index = findIndex(players, 'id', user.id);
+                if (index !== -1) {
+                    players[index].x = x;
+                    players[index].y = y;
+                } 
+            }).fail(function () {
+                console.log('spam'); 
+            });
         });
         
         socket.on('message', function (message) {
-            
-            roomEmit('message', user.nick, message);
-            
+            throttle.on(user.id + 'message').then(function () {
+                roomEmit('message', user.nick, message);
+            }).fail(function () {
+                console.log('spam');
+            });
         });
         
         // Handle commands
@@ -126,15 +146,19 @@ function createChannel (io, channelName) {
         }
         
         socket.on('command', function (commandName, params) {
-            let cmd = COMMANDS[commandName];
+            throttle.on(user.id + 'command').then(function () {
+                let cmd = COMMANDS[commandName];
 
-            if (cmd) {
-                if (cmd.params) {
-                    checkParams(cmd, params);
-                } else {
-                    cmd.handler();
+                if (cmd) {
+                    if (cmd.params) {
+                        checkParams(cmd, params);
+                    } else {
+                        cmd.handler();
+                    }
                 }
-            }
+            }).fail(function () {
+                console.log('spam');
+            });
         });
         
         socket.on('disconnect', function () {
