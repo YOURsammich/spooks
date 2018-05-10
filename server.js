@@ -26,6 +26,8 @@ function createChannel (io, channelName) {
     let room = io.of(channelName),
         players = [];
     
+    console.log(channelName, 'created');
+    
     function roomEmit() {
         room.in('chat').emit.apply(room, arguments);
     }
@@ -35,7 +37,14 @@ function createChannel (io, channelName) {
         roomEmit('playerPos', players);
     }, 100);
     
-    console.log(channelName, 'created');
+    let COMMANDS = {
+        nick : {
+            params : ['nick'],
+            handler : function (user, params) {
+                user.nick = nick;
+            }
+        }
+    }
     
     room.on('connection', function (socket) {
         const user = {
@@ -91,6 +100,41 @@ function createChannel (io, channelName) {
             
             roomEmit('message', nick, message);
             
+        });
+        
+        // Handle commands
+        
+        function checkParams (cmd, params) {
+            let validParams = {},
+                valid;
+            
+            //Loop thru the params a command requires server side
+            //verify client gave proper params
+            if (typeof params === 'object') {
+                for (let param of cmd.params) {
+                    if (params[param] && typeof params[param] === 'string') {
+                        validParams[param] = params[param];
+                    } else {
+                        valid = false;
+                    }
+                }
+                
+                if (valid) {
+                    cmd.handler(validParams);    
+                }
+            }
+        }
+        
+        socket.on('command', function (commandName, params) {
+            let cmd = COMMANDS[commandName];
+            
+            if (cmd) {   
+                if (cmd.params) {
+                    checkParams(cmd, params);
+                } else {
+                    cmd.handler();
+                }
+            }
         });
         
         socket.on('disconnect', function () {
