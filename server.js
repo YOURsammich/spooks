@@ -41,7 +41,7 @@ function createChannel (io, channelName) {
         nick : {
             params : ['nick'],
             handler : function (user, params) {
-                user.nick = nick;
+                user.nick = params.nick;
             }
         }
     }
@@ -96,9 +96,9 @@ function createChannel (io, channelName) {
             }
         });
         
-        socket.on('message', function (nick, message) {
+        socket.on('message', function (message) {
             
-            roomEmit('message', nick, message);
+            roomEmit('message', user.nick, message);
             
         });
         
@@ -106,7 +106,7 @@ function createChannel (io, channelName) {
         
         function checkParams (cmd, params) {
             let validParams = {},
-                valid;
+                valid = true;
             
             //Loop thru the params a command requires server side
             //verify client gave proper params
@@ -120,15 +120,15 @@ function createChannel (io, channelName) {
                 }
                 
                 if (valid) {
-                    cmd.handler(validParams);    
+                    cmd.handler(user, validParams);    
                 }
             }
         }
         
         socket.on('command', function (commandName, params) {
             let cmd = COMMANDS[commandName];
-            
-            if (cmd) {   
+
+            if (cmd) {
                 if (cmd.params) {
                     checkParams(cmd, params);
                 } else {

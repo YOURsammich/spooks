@@ -1,4 +1,5 @@
-var messager = {};
+const messager = {};
+const clientSubmit = {};
 
 messager.messageHTML = function () {
     let container = document.createElement('div'),
@@ -49,6 +50,62 @@ messager.showMessage = function (nick, message) {
     messager.scrollToBottom(messageEl.offsetHeight);
 }
 
+// -----------------------------------------------------------
+// clientSubmit handles any message or command being submitted
+// -----------------------------------------------------------
+
+clientSubmit.message = {};
+clientSubmit.command = {};
+
+clientSubmit.message.send = function (message) {
+    socket.emit('message', message);
+}
+
+clientSubmit.command.send = function (commandName, params) {
+    socket.emit('command', commandName, params)
+}
+
+clientSubmit.command.formatParams = function (commandParams, givenParams) {
+    const formattedParams = {};
+    const givenParamsSplit = givenParams.split(' ');
+    
+    for (let i = 0; i < givenParamsSplit.length; i++) {
+        if (commandParams[i]) {
+            formattedParams[commandParams[i]] = givenParamsSplit[i];   
+        }
+    }
+    
+    return formattedParams;
+}
+
+clientSubmit.command.handle = function (commandName, givenParams) {
+    const cmd = COMMANDS[commandName];
+
+    if (cmd) {
+        if (cmd.params) {
+            const formattedParams = this.formatParams(cmd.params, givenParams);
+            if (formattedParams) {
+                this.send(commandName, formattedParams);
+            }
+        } else {
+            cmd.handler();
+        }
+    } else {
+        messager.showMessage('system', 'invalid command');
+    }
+}
+
+clientSubmit.handleInput = function (value) {
+    const command = /^\/(\w+) ?([\s\S]*)/.exec(value);
+
+    if (command) {
+        const [, commandName, givenParams] = command;
+        this.command.handle(commandName, givenParams);
+    } else {
+        this.message.send(value);
+    }
+}
+
 socket.on('message', function (nick, message) {
     messager.showMessage(nick, message);
 });
@@ -58,7 +115,7 @@ document.getElementById('main-input').addEventListener('keydown', function (e) {
     var keyCode = e.which;
     
     if (keyCode === 13) {
-        socket.emit('message', 'sammich', this.value);
+        clientSubmit.handleInput(this.value);
         this.value = '';
     }
 });
