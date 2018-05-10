@@ -1,4 +1,4 @@
-var socket = io();
+var socket = io(window.location.pathname);
 
 var world = {
     tiles : [],
@@ -27,7 +27,7 @@ world.createMapBackground = function () {
         ctx = tempCanvas.getContext('2d');
     
     tempCanvas.width = tempCanvas.height = 2000;
-    
+    console.log(world.tiles);
     for (let layer of world.tiles) {
         let tileSheetKeys = Object.keys(layer);
         

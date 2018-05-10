@@ -2,6 +2,8 @@ var dao = require('./dao');
 var express = require('express');
 var fs = require('fs');
 
+var channels = {};
+
 function makeId () {
     var text = "";
     var possible = "!@#$%^&*()-_=+abcdefghijklmnopqrstuvwxyz0123456789";
@@ -20,25 +22,29 @@ function findIndex (ary, att, value) {
     return -1;
 }
 
-function initServer (io) {
-    var channelName = '';
+function createChannel (io, channelName) {
+    let room = io.of(channelName),
+        players = [];
     
-    var players = [];
-        
+    function roomEmit() {
+        room.in('chat').emit.apply(room, arguments);
+    }
+    
     //send all players positions out 
     setInterval(function () {
-        io.emit('playerPos', players);
-        console.log(players.length);
+        roomEmit('playerPos', players);
     }, 100);
     
-    io.on('connection', function (socket) {
-        console.log('connected');
-        
-        var user = {
+    console.log(channelName, 'created');
+    
+    room.on('connection', function (socket) {
+        const user = {
             remote_addr : socket.request.connection.remoteAddress,
             socket : socket,
             id : makeId()
         };
+        
+        console.log(channelName, 'user connected');
         
         socket.on('saveMap', function (mapData) {
             if (typeof mapData == 'object') {
@@ -55,10 +61,12 @@ function initServer (io) {
         });
         
         socket.on('requestJoin', function () {
-            
             socket.emit('youJoined', user.id);//tell yourself you joined
             socket.emit('playerJoined', players);//get all current users
-            io.emit('playerJoined', [{
+            
+            socket.join('chat'); //join room necessarily for receiving data 
+            
+            roomEmit('playerJoined', [{
                 x : 0,
                 y : 0,
                 id : user.id
@@ -72,7 +80,7 @@ function initServer (io) {
         });
         
         socket.on('updatePos', function (x, y) {
-            var index = findIndex(players, 'id', user.id);
+            const index = findIndex(players, 'id', user.id);
             if (index !== -1) {
                 players[index].x = x;
                 players[index].y = y;
@@ -81,24 +89,28 @@ function initServer (io) {
         
         socket.on('message', function (nick, message) {
             
-            io.emit('message', nick, message);
+            roomEmit('message', nick, message);
             
         });
         
         socket.on('disconnect', function () {
-            var index = findIndex(players, 'id', user.id);
+            const index = findIndex(players, 'id', user.id);
             
             if (index !== -1) {
-                io.emit('playerLeft', user.id);
+                roomEmit('playerLeft', user.id);
                 players.splice(index, 1);
             }
         });
         
     });
+    
+    
+    return true;
 }
 
 function intoapp (app, http) {
-    var io = require('socket.io')(http);
+    var io = require('socket.io')(http),
+        channelRegex = /^\/(\w*\/?)$/;
     
     app.use(express.static(__dirname + '/public'));
     
@@ -107,12 +119,18 @@ function intoapp (app, http) {
         res.send(index);   
     });
     
-    app.get('/', function (req, res) {
+    app.get(channelRegex, function (req, res) {
+        var channelName = channelRegex.exec(req.url)[1];
+        
+        if (!channelName) channelName = '/';
+        
+        if (!channels[channelName]) {
+            channels[channelName] = createChannel(io, channelName);
+        }
+        
         var index = fs.readFileSync('index.html').toString();
         res.send(index);
     });
-    
-    initServer(io);
 }
 
 (function () {
