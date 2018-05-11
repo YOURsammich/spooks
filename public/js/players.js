@@ -196,21 +196,23 @@ socket.on('playerPos', function (playersData) {
 // ----------------
 
 document.body.addEventListener('keydown', function (e) {
-    var keyCode = e.which,
-        hero = players.getPlayer(players.heroId);
+    const keyCode = e.which;
+    const hero = players.getPlayer(players.heroId);
+    const chatBoxInput = document.getElementById('main-input');
     
-    if (keyCode == 68 || keyCode == 39) {
-        hero.dir.right = true;
-    } else if (keyCode == 65 || keyCode == 37) {
-        hero.dir.left = true;
-    }
-    
-    if (keyCode == 87 || keyCode == 38) {
-        hero.dir.up = true;
-    } else if (keyCode == 83 || keyCode == 40) {
-        hero.dir.down = true;
-    }
-    
+    if (document.activeElement !== chatBoxInput) {
+        if (keyCode == 68 || keyCode == 39) {
+            hero.dir.right = true;
+        } else if (keyCode == 65 || keyCode == 37) {
+            hero.dir.left = true;
+        }
+
+        if (keyCode == 87 || keyCode == 38) {
+            hero.dir.up = true;
+        } else if (keyCode == 83 || keyCode == 40) {
+            hero.dir.down = true;
+        }
+    }    
 });
 
 document.body.addEventListener('keyup', function (e) {
