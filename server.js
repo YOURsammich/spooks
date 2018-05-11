@@ -106,8 +106,10 @@ function createChannel (io, channelName) {
             throttle.on(user.id + 'updatePos', 1000, 40).then(function () {
                 const index = findIndex(players, 'id', user.id);
                 if (index !== -1) {
-                    players[index].x = x;
-                    players[index].y = y;
+                    if (typeof x === 'number' && typeof y === 'number') {
+                        players[index].x = x;
+                        players[index].y = y;
+                    }
                 } 
             }).fail(function () {
                 console.log('spam'); 
