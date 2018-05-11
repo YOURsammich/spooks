@@ -22,8 +22,8 @@ players.addPlayer = function (id, x, y, avatarInfo) {
     
     players.online.push({
         id : id,
-        x : 50,
-        y : 50,
+        x : x || 50,
+        y : y || 50,
         goto : null,
         avatarInfo : avatarInfo,
         dir : {
