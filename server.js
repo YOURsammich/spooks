@@ -36,7 +36,7 @@ function createChannel (io, channelName) {
     //send all players positions out 
     setInterval(function () {
         roomEmit('playerPos', players);
-    }, 100);
+    }, 25);
     
     let COMMANDS = {
         nick : {
