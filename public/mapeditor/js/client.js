@@ -1,7 +1,8 @@
-var socket = io(window.location.pathname.substr(5));
+const socket = io(window.location.pathname.substr(5));
 //Fisher Price
+
 //world object contains functions relating to the map itself
-var world = {
+const world = {
     history : [],
     tiles : [],
     layers : [],
@@ -11,134 +12,108 @@ var world = {
 }
 
 //editTools object contains functions relating to tools used
-var editTools = {
+const editTools = {
     cTool : 'stamp'
 };
 
 world.drawMap = function (layer) {
-    var tilesFromLayer = world.tiles[layer],
-        tileSheetKeys;
+    const tileSheets = world.tiles[layer];
     
-    if (!tilesFromLayer) return;
-    
-    tileSheetKeys = Object.keys(tilesFromLayer);
-    
-    world.layers[layer].ctx.clearRect(0, 0, 2000, 2000);
-    
-    for (let t = 0; t < tileSheetKeys.length; t++) {
-        let tileSheetImg = world.tileSheets[tileSheetKeys[t]].img,
-            tileData = tilesFromLayer[tileSheetKeys[t]];
+    if (tileSheets) {
+        const tileSheetKeys = Object.keys(tileSheets);
+        world.layers[layer].ctx.clearRect(0, 0, 2000, 2000);
         
-        for (let i = 0; i < tileData.length; i++) {
-            world.layers[layer].ctx.drawImage(tileSheetImg, tileData[i][2] * 16, tileData[i][3] * 16, 16, 16, tileData[i][0], tileData[i][1], 16, 16);
-        }   
+        for (let tileSheet of tileSheetKeys) {
+            const tileSheetImg = world.tileSheets[tileSheet].img;
+            const tileData = world.tiles[layer][tileSheet];
+            
+            for (let tile of tileData) {
+                const [x, y, tileSheetX, tileSheetY] = tile;
+                world.layers[layer].ctx.drawImage(tileSheetImg, tileSheetX * 16, tileSheetY * 16, 16, 16, x, y, 16, 16);
+            }
+        } 
     }
 }
 
 world.addTilesheet = function (url) {
-    var tabContainer = document.getElementById('tileSetTabs'),
-        newTab = document.createElement('span'),
-        tileSheetCon = document.getElementById('tileSetSheets'),
-        newSheet = new Image(),
-        tileSheetCanvas = document.createElement('canvas'),
-        sheetCtx = tileSheetCanvas.getContext('2d');
+    const tabContainer = document.getElementById('tileSetTabs');
+    const tab = document.createElement('span');
+    const tileSheetCon = document.getElementById('tileSetSheets');
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     
     //add tab
-    newTab.textContent = url;
-    newTab.addEventListener('click', function () {
-        var allTileSheets = tileSheetCon.children;
-        this.className = 'selectedTab';
+    tab.textContent = url;
+    tab.addEventListener('click', function () {
+        const tileSheets = tileSheetCon.getElementsByClassName('tileSheetCanvas');
         
-        for (let i = 0; i < allTileSheets.length; i++) {//hide all sheets
-            let el = allTileSheets[i];
-            if (el.className == 'tileSheetCanvas') el.style.display = 'none';
+        for (let tileSheet of tileSheets) {
+            tileSheet.style.display = 'none';
         }
         
-        tileSheetCanvas.style.display = 'block';
-        world.activeTileSheet = {
-            canvas : tileSheetCanvas,
-            ctx : sheetCtx
-        };
+        this.className = 'selectedTab';
+        canvas.style.display = 'block';
+        world.activeTileSheet = {canvas, ctx};
     });
-    tabContainer.appendChild(newTab);
+    tabContainer.appendChild(tab);
     
     //append canvas for tilesheet
-    tileSheetCanvas.id = 'tilesheet-' + url;
-    tileSheetCanvas.className = 'tileSheetCanvas';
-    tileSheetCon.appendChild(tileSheetCanvas);
+    canvas.id = 'tilesheet-' + url;
+    canvas.className = 'tileSheetCanvas';
+    tileSheetCon.appendChild(canvas);
     
-    newSheet.onload = function () {//draw image on canvas
+    img.onload = function () {//draw image on canvas
         var highLightCan = document.getElementById('hightLight');
-        tileSheetCanvas.width = highLightCan.width = newSheet.width;
-        tileSheetCanvas.height = highLightCan.height = newSheet.height;
-        sheetCtx.drawImage(newSheet, 0, 0);
+        canvas.width = highLightCan.width = img.width;
+        canvas.height = highLightCan.height = img.height;
+        ctx.drawImage(img, 0, 0);
     }
     
-    newSheet.src = '../img/tilesheets/' + url;
+    img.src = '../img/tilesheets/' + url;
     
     //hide new sheets being added
     if (Object.keys(this.tileSheets).length) {
-        tileSheetCanvas.style.display = 'none';   
+        canvas.style.display = 'none';   
     } else {
-        world.activeTileSheet = {
-            canvas : tileSheetCanvas,
-            ctx : sheetCtx
-        };
-        newTab.className = 'selectedTab';
+        world.activeTileSheet = {canvas, ctx};
+        tab.className = 'selectedTab';
     }
     
-    this.tileSheets[url] = {
-        ctx : sheetCtx,
-        img : newSheet
-    }
+    this.tileSheets[url] = {ctx, img}
 }
 
 world.addLayer = function () {
-    var newCanvas = document.createElement('canvas'),
-        newCtx = newCanvas.getContext('2d'),
+    var canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d'),
         mapArea = document.getElementById('mapArea'),
         selectLayer = document.createElement('li'),
         layerNumber = world.layers.length,
         tileLayers = document.getElementById('tileLayers');
     
-    newCanvas.width = 2000;
-    newCanvas.height = 2000;
-    
-    world.layers.push({
-        canvas : newCanvas,
-        ctx : newCtx
-    });
-    
-    mapArea.insertBefore(newCanvas, document.getElementById('stamp'));
-    
+    canvas.width = canvas.height = 2000;
+    world.layers.push({canvas, ctx});
+    mapArea.insertBefore(canvas, document.getElementById('stamp'));
     selectLayer.textContent = 'Layer ' + world.layers.length;;
     
     selectLayer.addEventListener('click', function () {
-        var bgGrid = document.getElementById('bgGrid');
+        const bgGrid = document.getElementById('bgGrid');
         
-        document.getElementById('mapArea').insertBefore(bgGrid, newCanvas.nextElementSibling);
+        document.getElementById('mapArea').insertBefore(bgGrid, canvas.nextElementSibling);
         
-        world.activeLayer = {
-            layerNumber : layerNumber,
-            canvas : newCanvas,
-            ctx : newCtx
-        };
+        world.activeLayer = {layerNumber, canvas, ctx};
         editTools.stamp.activeLayer = layerNumber;
         document.getElementsByClassName('selected')[0].className = '';
         this.className = 'selected';
     });
     
     if (layerNumber === 0) {
-        world.activeLayer = {
-            layerNumber : layerNumber,
-            canvas : newCanvas,
-            ctx : newCtx
-        };
+        world.activeLayer = {layerNumber, canvas, ctx};
         editTools.stamp.activeLayer = layerNumber;
         selectLayer.className = 'selected';
-        mapArea.insertBefore(document.getElementById('bgGrid'), newCanvas);
+        mapArea.insertBefore(document.getElementById('bgGrid'), canvas);
     } else {
-     mapArea.insertBefore(document.getElementById('bgGrid'), newCanvas);
+        mapArea.insertBefore(document.getElementById('bgGrid'), canvas);
     }
     
     tileLayers.insertBefore(selectLayer, tileLayers.firstChild);
@@ -244,16 +219,13 @@ editTools.stamp.placeCell = function (layer, tileSheetId, X, Y, imgX, imgY) {
 }
 
 editTools.stamp.groupPlace = function (startX, startY, minX, minY, maxX, maxY) {
-    var moveX,
-        moveY,
-        tileSheet = editTools.stamp.activeTileSheet.canvas.id.substr(10),
+    var tileSheet = editTools.stamp.activeTileSheet.canvas.id.substr(10),
         saveHistory = [];
 
-    for (moveX = 0; moveX < maxX; moveX++) {
-        for (moveY = 0; moveY < maxY; moveY++) {
-            let index = editTools.getCell(editTools.stamp.activeLayer, (startX + moveX) * 16, (startY + moveY) * 16);
+    for (let moveX = 0; moveX < maxX; moveX++) {
+        for (let moveY = 0; moveY < maxY; moveY++) {
+            const index = editTools.getCell(editTools.stamp.activeLayer, (startX + moveX) * 16, (startY + moveY) * 16);
             if (index !== -1) {
-                if (!world.tiles[editTools.stamp.activeLayer]) console.log(world.tiles[editTools.stamp.activeLayer], index)
                 saveHistory.push([editTools.stamp.activeLayer, index[0], world.tiles[editTools.stamp.activeLayer][index[0]][index[1]]]);   
             } else {
                 saveHistory.push([editTools.stamp.activeLayer, 'erase', (startX + moveX) * 16, (startY + moveY) * 16]);
