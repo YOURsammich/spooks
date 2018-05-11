@@ -103,7 +103,7 @@ function createChannel (io, channelName) {
         });
         
         socket.on('updatePos', function (x, y) {
-            throttle.on(user.id + 'updatePos', 1000, 40).then(function () {
+            throttle.on(user.id + 'updatePos', 1000, 60).then(function () {
                 const index = findIndex(players, 'id', user.id);
                 if (index !== -1) {
                     players[index].x = x;
