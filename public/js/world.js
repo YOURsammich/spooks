@@ -46,34 +46,34 @@ world.createMapBackground = function () {
     world.background.src = tempCanvas.toDataURL();
 }
 
-world.addTilesheet = function (url) {
-    const img = new Image();
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    img.onload = function () {
-        let gameReady = true;
-        const tileSheetKeys = Object.keys(world.tileSheets);
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
+world.addTilesheet = function (url) {    
+    if (!world.tileSheets[url]) {
+        const img = new Image();
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
         
-        world.tileSheets[url].ready = true;
-        
-        for (let tileSheet of tileSheetKeys) {
-            if (!world.tileSheets[tileSheet].ready) gameReady = false;
+        img.onload = function () {
+            let gameReady = true;
+            const tileSheetKeys = Object.keys(world.tileSheets);
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            world.tileSheets[url].ready = true;
+
+            for (let tileSheet of tileSheetKeys) {
+                if (!world.tileSheets[tileSheet].ready) gameReady = false;
+            }
+
+            world.ready = gameReady; 
         }
-        
-        world.ready = gameReady; 
+
+        img.src = 'img/tilesheets/' + url;
+
+        world.tileSheets[url] = {ctx, img};   
+    } else {
+        throw "Tilesheet already set";
     }
-    
-    img.src = 'img/tilesheets/' + url;
-    
-    world.tileSheets[url] = {
-        ctx : ctx,
-        img : img,
-        ready : false
-    };
 }
 
 world.loadTileSheets = function (tileDataStr) {
@@ -85,7 +85,6 @@ world.loadTileSheets = function (tileDataStr) {
             if (!world.tileSheets[tileSheet]) world.addTilesheet(tileSheet);
         }
     }
-    
 }
 
 world.addLayer = function (name) {
