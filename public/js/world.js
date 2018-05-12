@@ -1,6 +1,6 @@
-var socket = io(window.location.pathname);
+const socket = io(window.location.pathname);
 
-var world = {
+const world = {
     tiles : [],
     layers : [],
     tileSheets : {},
@@ -15,26 +15,26 @@ var world = {
 }
 
 world.redrawBg = function () {
-    let view = world.view,
-        xPos = Math.abs(view.x),
-        yPos = Math.abs(view.y);
+    const view = world.view;
+    const xPos = Math.abs(view.x);
+    const yPos = Math.abs(view.y);
     
     world.layers[0].ctx.clearRect(0, 0, view.screenWidth, view.screenHeight);
     world.layers[0].ctx.drawImage(world.background, xPos, yPos, view.screenWidth, view.screenHeight, 0, 0, view.screenWidth, view.screenHeight);
 }
 
 world.createMapBackground = function () {
-    let tempCanvas = document.createElement('canvas'),
-        ctx = tempCanvas.getContext('2d');
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
     
     tempCanvas.width = tempCanvas.height = 2000;
 
     for (let layer of world.tiles) {
-        let tileSheetKeys = Object.keys(layer);
+        const tileSheetKeys = Object.keys(layer);
         
         for (let tileSheet of tileSheetKeys) {
-            let tileSheetImg = world.tileSheets[tileSheet].img,
-                tileData = layer[tileSheet];
+            const tileSheetImg = world.tileSheets[tileSheet].img;
+            const tileData = layer[tileSheet];
             
             for (let tile of tileData) {
                 ctx.drawImage(tileSheetImg, tile[2] * 16, tile[3] * 16, 16, 16, tile[0] + world.view.x, tile[1] + world.view.y, 16, 16);
@@ -47,9 +47,9 @@ world.createMapBackground = function () {
 }
 
 world.addTilesheet = function (url) {
-    let img = new Image(),
-        canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d');
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     
     img.onload = function () {
         let gameReady = true;
@@ -67,13 +67,13 @@ world.addTilesheet = function (url) {
         world.ready = gameReady; 
     }
     
-    this.tileSheets[url] = {
+    img.src = 'img/tilesheets/' + url;
+    
+    world.tileSheets[url] = {
         ctx : ctx,
         img : img,
         ready : false
     };
-    
-    img.src = 'img/tilesheets/' + url;
 }
 
 world.loadTileSheets = function (tileDataStr) {
@@ -89,19 +89,18 @@ world.loadTileSheets = function (tileDataStr) {
 }
 
 world.addLayer = function (name) {
-    let canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
     world.layers.push({canvas, ctx});
     
     document.getElementsByTagName('main')[0].appendChild(canvas);
 }
 
 world.reSizeWorld = function (width, height) {
-    let canvases = document.getElementsByTagName('canvas');
+    const canvases = document.getElementsByTagName('canvas');
     
     for (let canvas of canvases) {
         canvas.width = world.view.screenWidth = width;
@@ -113,8 +112,8 @@ world.reSizeWorld = function (width, height) {
 }
 
 world.setView = function (x, y) {
-    let rX = Math.round(x),
-        rY = Math.round(y);
+    const rX = Math.round(x);
+    const rY = Math.round(y);
     
     // change view on next iteration of gameLoop;
     world.changeView = {rX, rY};
