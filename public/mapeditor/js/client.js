@@ -395,6 +395,12 @@ document.getElementById('mapArea').addEventListener('mouseenter', function () {
     if (editTools.cTool === 'stamp') editTools.stamp.element.style.display = 'block';
 });
 
+// ------------------------------
+// Changing map settings
+// ------------------------------
+
+document.getElementById('addLayer').addEventListener('click', world.addLayer);
+
 // ------------------------------------------
 // Listners for shotcut keys
 // ------------------------------------------

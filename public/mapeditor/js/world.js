@@ -37,12 +37,12 @@ world.addTilesheet = function (url) {
     const img = new Image();
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    const highLightCan = document.getElementById('hightLight');
     
     //add tab
     tab.textContent = url;
     tab.addEventListener('click', function () {
         const tileSheets = tileSheetCon.getElementsByClassName('tileSheetCanvas');
-        const highLightCan = document.getElementById('hightLight');
         highLightCan.width = img.width;
         highLightCan.height = img.height;
         
@@ -66,12 +66,17 @@ world.addTilesheet = function (url) {
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
         
+        if (world.activeTileSheet.canvas === canvas) {
+            highLightCan.width = img.width;
+            highLightCan.height = img.height;
+        }
+        
         world.tileSheets[url].ready = true;
 
         for (let tileSheet of tileSheetKeys) {
             if (!world.tileSheets[tileSheet].ready) gameReady = false;
         }
-
+                
         world.ready = gameReady; 
     }
     
@@ -85,19 +90,14 @@ world.addTilesheet = function (url) {
         tab.className = 'selectedTab';
     }
     
-    
-    
     world.tileSheets[url] = {ctx, img}
 }
 
-world.loadTileSheets = function (tileDataStr) {
-    const tileData = JSON.parse(tileDataStr);
-    
-    for (let layer of tileData) {
-        const tileSheets = Object.keys(layer);
-        for (let tileSheet of tileSheets) {
-            if (!world.tileSheets[tileSheet]) world.addTilesheet(tileSheet);
-        }
+world.loadTileSheets = function () {
+    const acceptedTileSheets = ['Tileset.png', 'Snow.png'];
+
+    for (let tileSheet of acceptedTileSheets) {
+        world.addTilesheet(tileSheet);
     }
 }
 
@@ -132,9 +132,6 @@ world.addLayer = function () {
     tileLayers.insertBefore(selectLayer, tileLayers.firstChild);
 }
 
-world.addTilesheet('Tileset.png');
-world.addTilesheet('Snow.png');
-
 function drawGrid (mapData) {
     const bgcanvas = document.getElementById('bgGrid');
     const bgctx = bgcanvas.getContext('2d');
@@ -160,8 +157,9 @@ function drawGrid (mapData) {
 drawGrid();
 
 socket.on('mapData', function (mapData) {
+    world.loadTileSheets();
+    
     if (mapData && mapData.tiles && mapData.tiles.length) {
-        world.loadTileSheets(mapData.tiles);
         let waitForTileSheets = setInterval(function () {
             if (world.ready) {
                 clearInterval(waitForTileSheets);

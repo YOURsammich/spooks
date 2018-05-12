@@ -114,6 +114,11 @@ main header {
     flex-direction: column;
 }
 
+.toolContent button {
+    margin-top: 5px;
+    cursor: pointer;
+}
+
 #tileLayers {
     list-style-type: none;
     padding: 0px;
