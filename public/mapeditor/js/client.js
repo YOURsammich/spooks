@@ -1,158 +1,45 @@
-const socket = io(window.location.pathname.substr(5));
 //Fisher Price
-
-//world object contains functions relating to the map itself
-const world = {
-    history : [],
-    tiles : [],
-    layers : [],
-    tileSheets : {},
-    activeLayer : null,
-    activeTileSheet : null
-}
 
 //editTools object contains functions relating to tools used
 const editTools = {
     cTool : 'stamp'
 };
 
-world.drawMap = function (layer) {
-    const tileSheets = world.tiles[layer];
-    
-    if (tileSheets) {
-        const tileSheetKeys = Object.keys(tileSheets);
-        world.layers[layer].ctx.clearRect(0, 0, 2000, 2000);
-        
-        for (let tileSheet of tileSheetKeys) {
-            const tileSheetImg = world.tileSheets[tileSheet].img;
-            const tileData = world.tiles[layer][tileSheet];
-            
-            for (let tile of tileData) {
-                const [x, y, tileSheetX, tileSheetY] = tile;
-                world.layers[layer].ctx.drawImage(tileSheetImg, tileSheetX * 16, tileSheetY * 16, 16, 16, x, y, 16, 16);
-            }
-        } 
-    }
-}
-
-world.addTilesheet = function (url) {
-    const tabContainer = document.getElementById('tileSetTabs');
-    const tab = document.createElement('span');
-    const tileSheetCon = document.getElementById('tileSetSheets');
-    const img = new Image();
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    //add tab
-    tab.textContent = url;
-    tab.addEventListener('click', function () {
-        const tileSheets = tileSheetCon.getElementsByClassName('tileSheetCanvas');
-        
-        for (let tileSheet of tileSheets) {
-            tileSheet.style.display = 'none';
-        }
-        
-        this.className = 'selectedTab';
-        canvas.style.display = 'block';
-        world.activeTileSheet = {canvas, ctx};
-    });
-    tabContainer.appendChild(tab);
-    
-    //append canvas for tilesheet
-    canvas.id = 'tilesheet-' + url;
-    canvas.className = 'tileSheetCanvas';
-    tileSheetCon.appendChild(canvas);
-    
-    img.onload = function () {//draw image on canvas
-        var highLightCan = document.getElementById('hightLight');
-        canvas.width = highLightCan.width = img.width;
-        canvas.height = highLightCan.height = img.height;
-        ctx.drawImage(img, 0, 0);
-    }
-    
-    img.src = '../img/tilesheets/' + url;
-    
-    //hide new sheets being added
-    if (Object.keys(this.tileSheets).length) {
-        canvas.style.display = 'none';   
-    } else {
-        world.activeTileSheet = {canvas, ctx};
-        tab.className = 'selectedTab';
-    }
-    
-    this.tileSheets[url] = {ctx, img}
-}
-
-world.addLayer = function () {
-    var canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d'),
-        mapArea = document.getElementById('mapArea'),
-        selectLayer = document.createElement('li'),
-        layerNumber = world.layers.length,
-        tileLayers = document.getElementById('tileLayers');
-    
-    canvas.width = canvas.height = 2000;
-    world.layers.push({canvas, ctx});
-    mapArea.insertBefore(canvas, document.getElementById('stamp'));
-    selectLayer.textContent = 'Layer ' + world.layers.length;;
-    
-    selectLayer.addEventListener('click', function () {
-        const bgGrid = document.getElementById('bgGrid');
-        
-        document.getElementById('mapArea').insertBefore(bgGrid, canvas.nextElementSibling);
-        
-        world.activeLayer = {layerNumber, canvas, ctx};
-        editTools.stamp.activeLayer = layerNumber;
-        document.getElementsByClassName('selected')[0].className = '';
-        this.className = 'selected';
-    });
-    
-    if (layerNumber === 0) {
-        world.activeLayer = {layerNumber, canvas, ctx};
-        editTools.stamp.activeLayer = layerNumber;
-        selectLayer.className = 'selected';
-        mapArea.insertBefore(document.getElementById('bgGrid'), canvas);
-    } else {
-        mapArea.insertBefore(document.getElementById('bgGrid'), canvas);
-    }
-    
-    tileLayers.insertBefore(selectLayer, tileLayers.firstChild);
-}
-
 // ---------------------
 // tool misc functions
 // ---------------------
 
 editTools.undo = function () {
-    var h = world.history[world.history.length - 1];
+    const history = world.history[world.history.length - 1];
     
-    if (h) {
-        for (let i = 0; i < h.length; i++) {
+    if (history) {
+        for (let i = 0; i < history.length; i++) {
+            const tile = history[i];
             if (h[i][1] === 'erase') {
-                editTools.erase.clearCell(h[i][0], h[i][2] / 16, h[i][3] / 16);
+                editTools.erase.clearCell(tile[0], tile[2] / 16, tile[3] / 16);
             } else {
-                editTools.stamp.placeCell(h[i][0], h[i][1], h[i][2][0] / 16, h[i][2][1] / 16, h[i][2][2], h[i][2][3]);   
+                editTools.stamp.placeCell(tile[0], tile[1], tile[2][0] / 16, tile[2][1] / 16, tile[2][2], tile[2][3]);   
             }
         } 
-        world.drawMap(h[0][0]);
+        world.drawMap(tile[0][0]);
         world.history.pop();
     }
 }
 
 editTools.getCell = function (layer, X, Y) {
-    var tilesFromLayer = world.tiles[layer],
-        tileSheetKeys;
+    const tilesFromLayer = world.tiles[layer];
     
-    if (!tilesFromLayer) return -1;
-    
-    tileSheetKeys = Object.keys(tilesFromLayer);
-    
-    
-    for (let t = 0; t < tileSheetKeys.length; t++) {
-        for (let i = 0; i < tilesFromLayer[tileSheetKeys[t]].length; i++) {
-            let tile = tilesFromLayer[tileSheetKeys[t]][i];
-            if (tile[0] === X && tile[1] === Y) {
-                return [tileSheetKeys[t], i];
+    if (tilesFromLayer) {
+        const tileSheetKeys = Object.keys(tilesFromLayer);
+        
+        for (let tileSheet of tileSheetKeys) {
+            const tileData = tilesFromLayer[tileSheet];
+            
+            for (let i = 0; i < tileData.length; i++) {
+                let tile = tileData[i];
+                if (tile[0] === X && tile[1] === Y) {
+                    return [tileSheet, i];
+                }
             }
         }
     }
@@ -161,8 +48,8 @@ editTools.getCell = function (layer, X, Y) {
 }
 
 editTools.highLightTiles = function (startX, endX, startY, endY) {
-    var highLightCtx = document.getElementById('hightLight').getContext('2d'),
-        stamp = editTools.stamp;
+    const highLightCtx = document.getElementById('hightLight').getContext('2d');
+    const stamp = editTools.stamp;
     
     highLightCtx.clearRect(0, 0, 2000, 2000);
     highLightCtx.beginPath();
@@ -184,16 +71,15 @@ editTools.stamp = {
     maxY : 0,
     element : document.getElementById('stamp'),
     selecting : false,
-    activeTileSheet : null,
-    activeLayer : null
+    activeTileSheet : null
 }
 
 //load in currently selected tiles
 editTools.stamp.loadTiles = function () {
-    var stampCanvas = editTools.stamp.element.getElementsByTagName('canvas')[0],
-        stampCtx = stampCanvas.getContext('2d'),
-        stamp = editTools.stamp,
-        imgData = world.activeTileSheet.ctx.getImageData(stamp.minX * 16, stamp.minY * 16, stamp.maxX * 16, stamp.maxY * 16);
+    const stampCanvas = editTools.stamp.element.getElementsByTagName('canvas')[0];
+    const stampCtx = stampCanvas.getContext('2d');
+    const stamp = editTools.stamp;
+    const imgData = world.activeTileSheet.ctx.getImageData(stamp.minX * 16, stamp.minY * 16, stamp.maxX * 16, stamp.maxY * 16);
     
     stampCanvas.width = stamp.maxX * 16;
     stampCanvas.height = stamp.maxY * 16;
@@ -204,11 +90,10 @@ editTools.stamp.loadTiles = function () {
 
 editTools.stamp.placeCell = function (layer, tileSheetId, X, Y, imgX, imgY) {
     if (!world.tiles[layer]) world.tiles[layer] = {}; 
-    if (!world.tiles[layer][tileSheetId]) world.tiles[layer][tileSheetId] = []; 
-    var index = editTools.getCell(layer, X * 16, Y * 16);
-    if (index !== -1) {
-        world.tiles[layer][index[0]].splice(index[1], 1);
-    }
+    if (!world.tiles[layer][tileSheetId]) world.tiles[layer][tileSheetId] = [];
+    
+    const index = editTools.getCell(layer, X * 16, Y * 16);
+    if (index !== -1) world.tiles[layer][index[0]].splice(index[1], 1);
     
     world.tiles[layer][tileSheetId].push([// X, Y, imgX, imgY
         X * 16,
@@ -219,18 +104,18 @@ editTools.stamp.placeCell = function (layer, tileSheetId, X, Y, imgX, imgY) {
 }
 
 editTools.stamp.groupPlace = function (startX, startY, minX, minY, maxX, maxY) {
-    var tileSheet = editTools.stamp.activeTileSheet.canvas.id.substr(10),
-        saveHistory = [];
+    const tileSheet = editTools.stamp.activeTileSheet.canvas.id.substr(10);
+    const saveHistory = [];
 
     for (let moveX = 0; moveX < maxX; moveX++) {
         for (let moveY = 0; moveY < maxY; moveY++) {
-            const index = editTools.getCell(editTools.stamp.activeLayer, (startX + moveX) * 16, (startY + moveY) * 16);
+            const index = editTools.getCell(world.activeLayer.layerNumber, (startX + moveX) * 16, (startY + moveY) * 16);
             if (index !== -1) {
-                saveHistory.push([editTools.stamp.activeLayer, index[0], world.tiles[editTools.stamp.activeLayer][index[0]][index[1]]]);   
+                saveHistory.push([world.activeLayer.layerNumber, index[0], world.tiles[world.activeLayer.layerNumber][index[0]][index[1]]]);   
             } else {
-                saveHistory.push([editTools.stamp.activeLayer, 'erase', (startX + moveX) * 16, (startY + moveY) * 16]);
+                saveHistory.push([world.activeLayer.layerNumber, 'erase', (startX + moveX) * 16, (startY + moveY) * 16]);
             }
-            editTools.stamp.placeCell(editTools.stamp.activeLayer, tileSheet, startX + moveX, startY + moveY, minX + moveX, minY + moveY);
+            editTools.stamp.placeCell(world.activeLayer.layerNumber, tileSheet, startX + moveX, startY + moveY, minX + moveX, minY + moveY);
         }
     }
     
@@ -238,14 +123,14 @@ editTools.stamp.groupPlace = function (startX, startY, minX, minY, maxX, maxY) {
 }
 
 editTools.stamp.spreadDisplay = function (newX, newY) {
-    var stamp = editTools.stamp,
-        canvasStamp = stamp.element.getElementsByTagName('canvas')[0],
-        stampCtx = canvasStamp.getContext('2d'),
-        imgData = world.activeTileSheet.ctx.getImageData(stamp.minX * 16, stamp.minY * 16, stamp.maxX * 16, stamp.maxY * 16),
-        width = stamp.maxX * 16,
-        height = stamp.maxY * 16,
-        stampLeft = stamp.x * 16,
-        stampTop = stamp.y * 16;
+    const stamp = editTools.stamp;
+    const canvasStamp = stamp.element.getElementsByTagName('canvas')[0];
+    const stampCtx = canvasStamp.getContext('2d');
+    const imgData = world.activeTileSheet.ctx.getImageData(stamp.minX * 16, stamp.minY * 16, stamp.maxX * 16, stamp.maxY * 16);
+    const width = stamp.maxX * 16;
+    const height = stamp.maxY * 16;
+    const stampLeft = stamp.x * 16;
+    const stampTop = stamp.y * 16;
     
     if (newX <= 0) {
         stamp.element.style.left = (stampLeft + newX) + 'px';
@@ -553,50 +438,3 @@ document.getElementById('eraseTool').addEventListener('click', function () {
 function save () {
     socket.emit('saveMap', world.tiles);
 }
-
-function drawGrid (mapData) {
-    var bgcanvas = document.getElementById('bggrid'),
-        bgctx = bgcanvas.getContext('2d');
-    
-    bgcanvas.id = 'bgGrid';
-    bgcanvas.width = 2000;;
-    bgcanvas.height = 2000;
-    
-    bgctx.beginPath();
-    bgctx.strokeStyle = '#111';
-    bgctx.setLineDash([3, 1]);
-    for (let x = 0; x < bgcanvas.width; x += 16) {
-        bgctx.moveTo(x, 0);
-        bgctx.lineTo(x, bgcanvas.height);
-    }
-
-    for (let y = 0; y < bgcanvas.height; y += 16) {
-        bgctx.moveTo(0, y);
-        bgctx.lineTo(bgcanvas.width, y);
-    }
-    
-    bgctx.stroke();
-}
-drawGrid();
-
-world.addLayer();
-world.addLayer();
-world.addLayer();
-
-world.addTilesheet('Tileset.png');
-world.addTilesheet('Snow.png');
-
-socket.on('mapData', function (mapData) {
-    var i;
-    if (mapData && mapData.tiles) {
-        world.tiles = JSON.parse(mapData.tiles);
-        
-        for (i = 0; i < world.tiles.length; i++) {
-            world.drawMap(i);   
-        }
-    }
-});
-
-socket.on('connect', function () {
-    socket.emit('getMap'); 
-});

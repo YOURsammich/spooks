@@ -5,7 +5,7 @@ const world = {
     layers : [],
     tileSheets : {},
     background : new Image(),
-    loaded : false,
+    ready : false,
     view : {
         screenWidth : window.innerWidth,
         screenHeight : window.innerHeight,
