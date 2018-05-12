@@ -5,6 +5,7 @@ var world = {
     layers : [],
     tileSheets : {},
     background : new Image(),
+    loaded : false,
     view : {
         screenWidth : window.innerWidth,
         screenHeight : window.innerHeight,
@@ -27,7 +28,7 @@ world.createMapBackground = function () {
         ctx = tempCanvas.getContext('2d');
     
     tempCanvas.width = tempCanvas.height = 2000;
-    console.log(world.tiles);
+
     for (let layer of world.tiles) {
         let tileSheetKeys = Object.keys(layer);
         
@@ -46,22 +47,45 @@ world.createMapBackground = function () {
 }
 
 world.addTilesheet = function (url) {
-    let newSheet = new Image(),
-        mapCanvas = document.createElement('canvas'),
-        mapCtx = mapCanvas.getContext('2d');
+    let img = new Image(),
+        canvas = document.createElement('canvas'),
+        ctx = canvas.getContext('2d');
     
-    newSheet.onload = function () {
-        mapCanvas.width = newSheet.width;
-        mapCanvas.height = newSheet.height;
-        mapCtx.drawImage(newSheet, 0, 0);
+    img.onload = function () {
+        let gameReady = true;
+        const tileSheetKeys = Object.keys(world.tileSheets);
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        
+        world.tileSheets[url].ready = true;
+        
+        for (let tileSheet of tileSheetKeys) {
+            if (!world.tileSheets[tileSheet].ready) gameReady = false;
+        }
+        
+        world.ready = gameReady; 
     }
     
     this.tileSheets[url] = {
-        ctx : mapCtx,
-        img : newSheet
+        ctx : ctx,
+        img : img,
+        ready : false
     };
     
-    newSheet.src = 'img/tilesheets/' + url;
+    img.src = 'img/tilesheets/' + url;
+}
+
+world.loadTileSheets = function (tileDataStr) {
+    const tileData = JSON.parse(tileDataStr);
+    
+    for (let layer of tileData) {
+        const tileSheets = Object.keys(layer);
+        for (let tileSheet of tileSheets) {
+            if (!world.tileSheets[tileSheet]) world.addTilesheet(tileSheet);
+        }
+    }
+    
 }
 
 world.addLayer = function (name) {
@@ -100,15 +124,19 @@ window.addEventListener('resize', function () {
     world.reSizeWorld(window.innerWidth, window.innerHeight);
 });
 
-world.addTilesheet('Tileset.png');
-
 world.addLayer('bglayer1');
 world.addLayer('playerLayer');
 
 socket.on('mapData', function (mapData) {
     if (mapData && mapData.tiles) {
-        world.tiles = JSON.parse(mapData.tiles);
-        world.createMapBackground(world.tiles);
+        world.loadTileSheets(mapData.tiles);
+        let waitForTileSheets = setInterval(function () {
+            if (world.ready) {
+                clearInterval(waitForTileSheets);
+                world.tiles = JSON.parse(mapData.tiles);
+                world.createMapBackground(world.tiles);
+            }
+        }, 100);
     }
 });
 
