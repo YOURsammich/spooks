@@ -73,6 +73,8 @@ function createChannel (io, channelName) {
             throttle.on(user.remote_addr + 'getMap').then(function () {
                 dao.getMap(channelName).then(function (mapData) {
                     socket.emit('mapData', mapData);
+                }).fail(function () {
+                    socket.emit('mapData'); 
                 });
             }).fail(function () {
                 console.log('spam'); 
@@ -186,8 +188,8 @@ function intoapp (app, http) {
     app.use(express.static(__dirname + '/public'));
     
     app.get(editerRegex, function (req, res) {
-        var channelName = editerRegex.exec(req.url)[1].substr(4);
-        
+        var channelName = editerRegex.exec(req.url)[1];
+
         if (!channelName) channelName = '/';
         
         if (!channels[channelName]) {
