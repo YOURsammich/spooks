@@ -112,18 +112,17 @@ players.updatePos = function (player) {
         }
         
         if (player.id === players.heroId) { // send YOUR coords to the server
-            let viewX = 0,
-                viewY = 0;
+            const halfWidth = world.view.screenWidth / 2;
+            const halfHeight = world.view.screenHeight / 2;
+            const playerX = player.x * 2;
+            const playerY = player.y * 2;
+            let viewX = null;
+            let viewY = null;
             
-            if (player.x * 2 > world.view.screenWidth / 2) {
-                viewX = -((player.x * 2) - (world.view.screenWidth / 2));
-            }
+            if (playerX > halfWidth) viewX = -Math.floor(playerX - halfWidth);
+            if (playerY > halfHeight) viewY = -Math.floor(playerY - halfHeight);
             
-            if (player.y * 2 > world.view.screenHeight / 2) {
-                viewY = -((player.y * 2) - (world.view.screenHeight / 2));
-            }
-            
-            if (viewX || viewY) world.setView(viewX, viewY);
+            if (viewX !== null || viewY !== null) world.setView(viewX, viewY);
             
             socket.emit('updatePos', player.x, player.y);
         }
@@ -179,9 +178,9 @@ socket.on('youJoined', function (id) {
 socket.on('playerJoined', function (newUsers) {
     if (typeof newUsers === 'object') {
         for (let player of newUsers) {
-            let {x, y, id} = player;
+            let {x, y, id} = player.position;
             if (typeof id === 'string' && id !== players.heroId) {
-                players.addPlayer(id, x, y);   
+                players.addPlayer(id, x, y);
             }
         }
     }

@@ -24,8 +24,11 @@ function findIndex (ary, att, value) {
 }
 
 function createChannel (io, channelName) {
-    let room = io.of(channelName),
-        players = [];
+    const room = io.of(channelName);
+    const positions = [];
+    const channel = {
+        online : []
+    }
     
     console.log(channelName, 'created');
     
@@ -39,7 +42,7 @@ function createChannel (io, channelName) {
     
     //send all players positions out 
     setInterval(function () {
-        roomEmit('playerPos', players);
+        roomEmit('playerPos', positions);
     }, 100);
     
     let COMMANDS = {
@@ -88,22 +91,36 @@ function createChannel (io, channelName) {
         
         socket.on('requestJoin', function () {
             throttle.on(user.remote_addr + 'join').then(function () {
+                const connectedPlayers = [];
+                const positionData = {
+                    x : 0,
+                    y : 0,
+                    id : user.id
+                };
+                
+                for (let player of channel.online) {
+                    const playerPositionIndex = findIndex(channel.online, 'id', player.id);
+                    
+                    connectedPlayers.push({
+                        nick : player.nick,
+                        id : player.id,
+                        position : positions[playerPositionIndex]
+                    });
+                }
+                
                 socket.emit('youJoined', user.id);//tell yourself you joined
-                socket.emit('playerJoined', players);//get all current users
+                socket.emit('playerJoined', connectedPlayers);//get all current users
 
                 socket.join('chat'); //join room necessarily for receiving data 
 
                 roomEmit('playerJoined', [{
-                    x : 0,
-                    y : 0,
-                    id : user.id
+                    nick : user.nick,
+                    id : user.id,
+                    position : positionData
                 }]);//tell everyone you joined
 
-                players.push({
-                    x : 0,
-                    y : 0,
-                    id : user.id
-                })
+                positions.push(positionData);
+                channel.online.push(user);
             }).fail(function () {
                 console.log('spam'); 
             });
@@ -111,15 +128,15 @@ function createChannel (io, channelName) {
         
         socket.on('updatePos', function (x, y) {
             throttle.on(user.id + 'updatePos', 1000, 40).then(function () {
-                const index = findIndex(players, 'id', user.id);
+                const index = findIndex(positions, 'id', user.id);
                 if (index !== -1) {
                     if (typeof x === 'number' && typeof y === 'number') {
-                        players[index].x = x;
-                        players[index].y = y;
+                        positions[index].x = x;
+                        positions[index].y = y;
                     }
                 } 
             }).fail(function () {
-                console.log('spam'); 
+                //console.log('spam'); 
             });
         });
         
@@ -174,18 +191,20 @@ function createChannel (io, channelName) {
         });
         
         socket.on('disconnect', function () {
-            const index = findIndex(players, 'id', user.id);
+            const posIndex = findIndex(positions, 'id', user.id);
+            const userIndex = findIndex(channel.online, 'id', user.id);
             
-            if (index !== -1) {
+            if (posIndex !== -1 && userIndex !== -1) {
                 roomEmit('playerLeft', user.id);
-                players.splice(index, 1);
+                positions.splice(posIndex, 1);
+                channel.online.splice(userIndex, 1);
             }
         });
         
     });
     
     
-    return true;
+    return channel;
 }
 
 function intoapp (app, http) {
