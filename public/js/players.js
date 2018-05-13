@@ -6,7 +6,7 @@ var players = {
 var defualtAvy = new Image();
 defualtAvy.src = 'img/avy/DefaultAvatar.png';
 
-players.addPlayer = function (id, x, y, avatarInfo) {
+players.addPlayer = function (id, x, y, nick, avatarInfo) {
     if (!avatarInfo) {
         avatarInfo = {
             width : 32,
@@ -22,6 +22,7 @@ players.addPlayer = function (id, x, y, avatarInfo) {
     
     players.online.push({
         id : id,
+        nick : nick,
         x : x || 50,
         y : y || 50,
         goto : null,
@@ -180,7 +181,7 @@ socket.on('playerJoined', function (newUsers) {
         for (let player of newUsers) {
             let {x, y, id} = player.position;
             if (typeof id === 'string' && id !== players.heroId) {
-                players.addPlayer(id, x, y);
+                players.addPlayer(id, x, y, player.nick);
             }
         }
     }
