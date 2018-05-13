@@ -110,6 +110,11 @@ clientSubmit.handleInput = function (value) {
 
 socket.on('message', messager.showMessage);
 
+//Welcome message
+messager.showMessage({
+    message : 'Welcome to Spooks (Beta Version)',
+    messageType : 'general'
+})
 
 document.getElementById('main-input').addEventListener('keydown', function (e) {
     var keyCode = e.which;
