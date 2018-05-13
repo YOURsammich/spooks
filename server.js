@@ -29,8 +29,12 @@ function createChannel (io, channelName) {
     
     console.log(channelName, 'created');
     
-    function roomEmit() {
+    function roomEmit () {
         room.in('chat').emit.apply(room, arguments);
+    }
+    
+    function showMessage (socket, message, messageType) {
+        socket.emit('message', { message, messageType });
     }
     
     //send all players positions out 
@@ -120,7 +124,10 @@ function createChannel (io, channelName) {
         
         socket.on('message', function (message) {
             throttle.on(user.id + 'message').then(function () {
-                roomEmit('message', user.nick, message);
+                roomEmit('message', {
+                    message : message,
+                    nick : user.nick
+                });
             }).fail(function () {
                 console.log('spam');
             });

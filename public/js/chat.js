@@ -1,50 +1,52 @@
 const messager = {};
 const clientSubmit = {};
 
-messager.messageHTML = function () {
-    let container = document.createElement('div'),
-        time = document.createElement('div'),
-        nick = document.createElement('div'),
-        message = document.createElement('div');
-        
-    container.className = 'message';
-    time.className = 'time';
-    nick.className = 'nick';
-    message.className = 'message-content';
+messager.getTime = function () {
+    const time = new Date();
+    const hour = time.getHours();
+    const minute = time.getMinutes();
+    const timeString = hour + ':' + minute;
     
-    container.appendChild(time);
-    container.appendChild(nick);
-    container.appendChild(message);
-    
-    return { container, time, nick, message };
+    return timeString;
 }
 
-messager.newMessage = function (nick, message) {
-    let messageHTML = messager.messageHTML(),
-        time = new Date(),
-        hour = time.getHours(),
-        minute = time.getMinutes(),
-        timeString = hour + ':' + minute;
+messager.messageHTML = function (messageData) {
+    const container = document.createElement('div');
+    const time = document.createElement('div');
+    const nick = document.createElement('div');
+    const message = document.createElement('div');
+        
+    container.className = 'message';
     
-    messageHTML.time.textContent = timeString + ' ';
-    messageHTML.nick.textContent = nick + ': ';
-    messageHTML.message.textContent = message;
+    time.className = 'time';
+    time.textContent = messager.getTime() + ' ';
+    container.appendChild(time);
     
-    return messageHTML.container;
+    if (messageData.nick) {
+        nick.className = 'nick';
+        nick.textContent = messageData.nick + ': ';
+        container.appendChild(nick);
+    }
+    
+    message.textContent = messageData.message;
+    message.className = 'message-content';
+    container.appendChild(message);
+    
+    return container;
 }
 
 messager.scrollToBottom = function (elHeight) {
-    let messageContainer = document.getElementById('message-container'),
-        totalScroll = messageContainer.scrollHeight - messageContainer.offsetHeight,
-        currentScroll = messageContainer.scrollTop;
+    const messageContainer = document.getElementById('message-container');
+    const totalScroll = messageContainer.scrollHeight - messageContainer.offsetHeight;
+    const currentScroll = messageContainer.scrollTop;
     
     if (totalScroll - currentScroll <= elHeight) {
         messageContainer.scrollTop = totalScroll;
     }
 }
 
-messager.showMessage = function (nick, message) {
-    let messageEl = messager.newMessage(nick, message);
+messager.showMessage = function (messageData) {
+    const messageEl = messager.messageHTML(messageData);
     
     document.getElementById('message-container').appendChild(messageEl);
     messager.scrollToBottom(messageEl.offsetHeight);
@@ -106,9 +108,7 @@ clientSubmit.handleInput = function (value) {
     }
 }
 
-socket.on('message', function (nick, message) {
-    messager.showMessage(nick, message);
-});
+socket.on('message', messager.showMessage);
 
 
 document.getElementById('main-input').addEventListener('keydown', function (e) {
