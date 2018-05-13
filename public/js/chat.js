@@ -16,7 +16,7 @@ messager.messageHTML = function (messageData) {
     const nick = document.createElement('div');
     const message = document.createElement('div');
         
-    container.className = 'message';
+    container.className = 'message ' + (messageData.messageType || '');;
     
     time.className = 'time';
     time.textContent = messager.getTime() + ' ';

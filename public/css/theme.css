@@ -74,3 +74,14 @@ main canvas {
     width: 100%;
 }
 
+/* MESSAGE TYPES */
+
+.general .message-content:before,
+.general .message-content:after{
+    content: ' ** '
+}
+
+.general {
+    color: #2CE72C;
+}
+

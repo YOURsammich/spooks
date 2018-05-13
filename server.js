@@ -47,6 +47,7 @@ function createChannel (io, channelName) {
             params : ['nick'],
             handler : function (user, params) {
                 user.nick = params.nick;
+                roomEmit('nick', user.id, user.nick);
             }
         }
     }

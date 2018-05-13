@@ -46,9 +46,20 @@ players.getPlayer = function (id) {
 }
 
 players.deletePlayer = function (id) {
-    let playerIndex = players.getPlayerIndex(id);
+    const playerIndex = players.getPlayerIndex(id);
     if (playerIndex !== -1) {
         players.online.splice(playerIndex, 1);    
+    }
+}
+
+players.changeNick = function (id, newNick) {
+    const player = players.getPlayer(id);
+    if (player !== -1) {
+        messager.showMessage({
+            message : (player.nick || 'anon') + ' is now known as ' + newNick,
+            messageType : 'general'
+        });
+        player.nick = newNick;
     }
 }
 
@@ -189,7 +200,9 @@ socket.on('playerPos', function (playersData) {
             if (livePlayer) livePlayer.goto = [x, y];
         }
     }    
-})
+});
+
+socket.on('nick', players.changeNick);
 
 // ----------------
 // player controls
