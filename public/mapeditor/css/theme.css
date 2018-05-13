@@ -117,11 +117,14 @@ main header {
 .toolContent button {
     margin-top: 5px;
     cursor: pointer;
+    height: 45px;
 }
 
 #tileLayers {
+    flex: 1;
     list-style-type: none;
     padding: 0px;
+    overflow-y: auto;
 }
 
 #tileLayers li {
