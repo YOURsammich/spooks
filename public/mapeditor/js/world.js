@@ -66,7 +66,7 @@ world.addTilesheet = function (url) {
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
         
-        if (world.activeTileSheet.canvas === canvas) {
+        if (world.activeTileSheet.canvas === canvas) {//first canvas added
             highLightCan.width = img.width;
             highLightCan.height = img.height;
         }

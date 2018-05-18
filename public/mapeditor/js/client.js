@@ -15,13 +15,13 @@ editTools.undo = function () {
     if (history) {
         for (let i = 0; i < history.length; i++) {
             const tile = history[i];
-            if (h[i][1] === 'erase') {
+            if (history[i][1] === 'erase') {
                 editTools.erase.clearCell(tile[0], tile[2] / 16, tile[3] / 16);
             } else {
                 editTools.stamp.placeCell(tile[0], tile[1], tile[2][0] / 16, tile[2][1] / 16, tile[2][2], tile[2][3]);   
             }
         } 
-        world.drawMap(tile[0][0]);
+        world.drawMap(history[0][0]);
         world.history.pop();
     }
 }
@@ -126,7 +126,7 @@ editTools.stamp.spreadDisplay = function (newX, newY) {
     const stamp = editTools.stamp;
     const canvasStamp = stamp.element.getElementsByTagName('canvas')[0];
     const stampCtx = canvasStamp.getContext('2d');
-    const imgData = world.activeTileSheet.ctx.getImageData(stamp.minX * 16, stamp.minY * 16, stamp.maxX * 16, stamp.maxY * 16);
+    const imgData = stamp.activeTileSheet.ctx.getImageData(stamp.minX * 16, stamp.minY * 16, stamp.maxX * 16, stamp.maxY * 16);
     const width = stamp.maxX * 16;
     const height = stamp.maxY * 16;
     const stampLeft = stamp.x * 16;
@@ -204,7 +204,7 @@ editTools.stamp.keyup = function (e) {
 
 editTools.stamp.mousemove = function (e, x, y) {
     var stamp = editTools.stamp;
-    if (e.shiftKey) {
+    if (e.shiftKey && stamp.activeTileSheet) {// don't spread display unless tiles have been selected
         stamp.spreadPost = true;
         editTools.stamp.spreadDisplay((x - stamp.x) * 16, (y - stamp.y) * 16);
     } else {
