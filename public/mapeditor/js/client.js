@@ -185,14 +185,17 @@ editTools.stamp.multiPlace = function (startX, startY, stopX, stopY) {
 }
 
 editTools.stamp.mousedown = function (e, x, y) {
-    if (this.spreadPost) {
-        this.spreadPost = false;
-        this.loadTiles();
-        this.multiPlace(this.x, this.y, x, y);
-    } else {
-        this.groupPlace(this.x, this.y, this.minX, this.minY, this.maxX, this.maxY);
+    const stamp = editTools.stamp;
+    if (stamp.activeTileSheet) { // tiles are selected
+        if (stamp.spreadPost) {
+            stamp.spreadPost = false;
+            stamp.loadTiles();
+            stamp.multiPlace(stamp.x, stamp.y, x, y);
+        } else {
+            stamp.groupPlace(stamp.x, stamp.y, stamp.minX, stamp.minY, stamp.maxX, stamp.maxY);
+        }
+        world.drawMap(world.activeLayer.layerNumber);   
     }
-    world.drawMap(world.activeLayer.layerNumber);
 }
 
 editTools.stamp.keyup = function (e) {
@@ -203,15 +206,17 @@ editTools.stamp.keyup = function (e) {
 }
 
 editTools.stamp.mousemove = function (e, x, y) {
-    var stamp = editTools.stamp;
-    if (e.shiftKey && stamp.activeTileSheet) {// don't spread display unless tiles have been selected
-        stamp.spreadPost = true;
-        editTools.stamp.spreadDisplay((x - stamp.x) * 16, (y - stamp.y) * 16);
-    } else {
-        stamp.x = x;
-        stamp.y = y;
-        stamp.element.style.left = (x * 16) + 'px';
-        stamp.element.style.top = (y * 16) + 'px';
+    const stamp = editTools.stamp;
+    if (stamp.activeTileSheet) { // tiles are selected
+        if (e.shiftKey) {
+            stamp.spreadPost = true;
+            editTools.stamp.spreadDisplay((x - stamp.x) * 16, (y - stamp.y) * 16);
+        } else {
+            stamp.x = x;
+            stamp.y = y;
+            stamp.element.style.left = (x * 16) + 'px';
+            stamp.element.style.top = (y * 16) + 'px';
+        }   
     }
 }
 
