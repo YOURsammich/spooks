@@ -37,7 +37,7 @@ main canvas {
 #message-container {
     flex: 1;
     margin: 10px;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 .message {
