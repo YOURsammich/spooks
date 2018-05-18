@@ -73,7 +73,7 @@ function createChannel (io, channelName) {
                     });
                 } 
             }).fail(function () {
-                console.log('spam'); 
+                showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
@@ -85,7 +85,7 @@ function createChannel (io, channelName) {
                     socket.emit('mapData'); 
                 });
             }).fail(function () {
-                console.log('spam'); 
+                showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
@@ -122,7 +122,7 @@ function createChannel (io, channelName) {
                 positions.push(positionData);
                 channel.online.push(user);
             }).fail(function () {
-                console.log('spam'); 
+                showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
@@ -136,7 +136,7 @@ function createChannel (io, channelName) {
                     }
                 } 
             }).fail(function () {
-                //console.log('spam'); 
+                //showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
@@ -147,7 +147,7 @@ function createChannel (io, channelName) {
                     nick : user.nick
                 });
             }).fail(function () {
-                console.log('spam');
+                //showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
@@ -186,7 +186,7 @@ function createChannel (io, channelName) {
                     }
                 }
             }).fail(function () {
-                console.log('spam');
+                showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
