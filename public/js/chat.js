@@ -110,6 +110,13 @@ clientSubmit.handleInput = function (value) {
 
 socket.on('message', messager.showMessage);
 
+socket.on('disconnect', function () {
+    messager.showMessage({
+        message : 'disconnected',
+        messageType : 'error'
+    })
+});
+
 //Welcome message
 messager.showMessage({
     message : 'Welcome to Spooks (Beta Version)',

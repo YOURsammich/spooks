@@ -76,8 +76,10 @@ main canvas {
 
 /* MESSAGE TYPES */
 
+.error .message-content:before,
+.error .message-content:after,
 .general .message-content:before,
-.general .message-content:after{
+.general .message-content:after {
     content: ' ** '
 }
 
@@ -85,3 +87,7 @@ main canvas {
     color: #2CE72C;
 }
 
+.error {
+    color: #FF0000;
+    font-weight: bold;
+}
