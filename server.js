@@ -93,8 +93,8 @@ function createChannel (io, channelName) {
             throttle.on(user.remote_addr + 'join').then(function () {
                 const connectedPlayers = [];
                 const positionData = {
-                    x : 0,
-                    y : 0,
+                    x : 50,
+                    y : 50,
                     id : user.id
                 };
                 
@@ -108,8 +108,8 @@ function createChannel (io, channelName) {
                     });
                 }
                 
-                socket.emit('youJoined', user.id);//tell yourself you joined
-                socket.emit('playerJoined', connectedPlayers);//get all current users
+                socket.emit('youJoined', user.id, positionData, user.nick);//tell yourself you joined
+                socket.emit('playerJoined', connectedPlayers, true);//get all current users
 
                 socket.join('chat'); //join room necessarily for receiving data 
 
@@ -202,7 +202,6 @@ function createChannel (io, channelName) {
         });
         
     });
-    
     
     return channel;
 }

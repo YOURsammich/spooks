@@ -6,7 +6,7 @@ var players = {
 var defualtAvy = new Image();
 defualtAvy.src = 'img/avy/DefaultAvatar.png';
 
-players.addPlayer = function (id, x, y, nick, avatarInfo) {
+players.addPlayer = function (id, x, y, nick, avatarInfo, joinMessage) {
     if (!avatarInfo) {
         avatarInfo = {
             width : 32,
@@ -34,6 +34,13 @@ players.addPlayer = function (id, x, y, nick, avatarInfo) {
             up : false
         }
     });
+    
+    if (joinMessage) {
+        messager.showMessage({
+            message : nick + ' has joined',
+            messageType : 'general'
+        });   
+    }
 }
 
 players.getPlayerIndex = function (id) {
@@ -49,7 +56,12 @@ players.getPlayer = function (id) {
 players.deletePlayer = function (id) {
     const playerIndex = players.getPlayerIndex(id);
     if (playerIndex !== -1) {
-        players.online.splice(playerIndex, 1);    
+        const player = players.online[playerIndex];
+        messager.showMessage({
+            message : player.nick + ' has left',
+            messageType : 'general'
+        });
+        players.online.splice(playerIndex, 1);
     }
 }
 
@@ -171,17 +183,19 @@ players.redrawAllPlayers = function () {
     }
 }
 
-socket.on('youJoined', function (id) {
+socket.on('youJoined', function (id, posData, nick) {
+    const {x, y} = posData;
     players.heroId = id;
-    players.addPlayer(id);
+    players.addPlayer(id, x, y, nick);
 });
 
-socket.on('playerJoined', function (newUsers) {
+//isOldUsers will be true if its users that were already here before Hero joined
+socket.on('playerJoined', function (newUsers, isOldUsers) {
     if (typeof newUsers === 'object') {
         for (let player of newUsers) {
             let {x, y, id} = player.position;
             if (typeof id === 'string' && id !== players.heroId) {
-                players.addPlayer(id, x, y, player.nick);
+                players.addPlayer(id, x, y, player.nick, isOldUsers);
             }
         }
     }
