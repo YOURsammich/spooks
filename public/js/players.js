@@ -6,7 +6,7 @@ var players = {
 var defualtAvy = new Image();
 defualtAvy.src = 'img/avy/DefaultAvatar.png';
 
-players.addPlayer = function (id, x, y, nick, avatarInfo, joinMessage) {
+players.addPlayer = function (id, x, y, nick, noMessage, avatarInfo) {
     if (!avatarInfo) {
         avatarInfo = {
             width : 32,
@@ -35,7 +35,7 @@ players.addPlayer = function (id, x, y, nick, avatarInfo, joinMessage) {
         }
     });
     
-    if (joinMessage) {
+    if (!noMessage) {
         messager.showMessage({
             message : nick + ' has joined',
             messageType : 'general'
