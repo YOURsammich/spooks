@@ -20,6 +20,31 @@ wrap {
     height: 100%;
 }
 
+/* HEADER */
+
+toolbar {
+    background-color: #ddd;
+}
+
+toolbar ul {
+    display: inline-block;
+    margin: 0;
+    padding: 3px;
+}
+
+toolbar span {
+    margin: 2px 7px;
+}
+
+.selectedTool {
+    background-color: #5af;
+    border: 1px solid #aaa;
+}
+
+toolbar li:hover {
+    background-color: #82b1ff;
+}
+
 #systemToolbar {
     background-color: #eee;
     padding: 1px;
@@ -33,64 +58,59 @@ wrap {
     display: inline-block;
 }
 
-toolBar span:hover {
-    background-color: #82b1ff;
-}
-
-#mapToolbar {
-    background-color: #ddd;
-    padding: 3px;
-}
-
 #stamp {
     position: absolute;
     pointer-events: none;
     opacity: 0.7;
 }
 
-#stamp canvas{
+#stamp canvas {
     position: unset !important;
 }
 
-/*tool icons*/
+/* tool icons */
 
 .toolIcon {
     display: inline-block;
-    width: 30px;
-    height: 30px;
+    list-style-type: none;
+    display: inline-block;
+}
+
+.toolIcon span {
     background-repeat: no-repeat;
     background-image: url(../img/MapEditorTools.png);
+    display: block;
+    width: 32px;
+    height: 32px;
 }
 
 .divider {
     display: inline-block;
     border-left: 1px solid #aaa;
-    height: 30px;
+    height: 32px;
 }
 
 .newMap {
-    background-position: -1px -97px; 
+    background-position: 0px -96px; 
 }
 
 .openMap {
-    background-position: -34px -33px; 
+    background-position: -32px -32px; 
 }
 
 .saveMap {
-    background-position: -1px -33px;
+    background-position: 0px -32px;
 }
 
 .stampMap {
-    background-position: -1px -1px;
+    background-position: 0px 0px;
 }
 
 .eraserMap {
-    background-position: -66px -1px;
+    background-position: -64px 0px;
 }
 
-toolbar span {
-    margin-left: 15px;
-}
+/* MAIN */
 
 main {
     display: flex;

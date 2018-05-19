@@ -17,14 +17,16 @@
                     <span>Layer</span>
                     <span>Help</span>
                 </div>
-                <div id="mapToolbar">
-                    <span class="newMap toolIcon"></span>
-                    <span class="openMap toolIcon"></span>
-                    <span class="saveMap toolIcon"></span>
-                    <span class="divider"></span>
-                    <span id="stampTool" class="stampMap toolIcon"></span>
-                    <span id="eraseTool" class="eraserMap toolIcon"></span>
-                </div>
+                <ul id="mapSettings">
+                    <li class="toolIcon"><span class="newMap"></span></li>
+                    <li class="toolIcon"><span class="openMap"></span></li>
+                    <li class="toolIcon"><span class="saveMap"></span></li>
+                </ul>
+                <div class="divider"></div>
+                <ul id="mapTools">
+                    <li id="stampTool" class="toolIcon selectedTool"><span class="stampMap mapTool"></span></li>
+                    <li id="eraseTool" class="toolIcon"><span class="eraserMap mapTool"></span></li>
+                </ul>
             </toolbar>
             
             <main>

@@ -435,16 +435,24 @@ document.body.addEventListener('keyup', function (e) {
 });
 
 //for switching tools
-document.getElementById('stampTool').addEventListener('click', function () {
-    editTools.cTool = 'stamp';
-    editTools.stamp.element.style.display = 'block';
+document.getElementById('mapTools').addEventListener('click', function (e) {
+    let target = e.target;
+    let selectedTool = document.getElementsByClassName('selectedTool')[0];
+    
+    if (target.parentElement.nodeName === 'LI') target = target.parentElement;
+    
+    if (target.nodeName === 'LI') {
+        if (target.id === 'stampTool') {
+            editTools.cTool = 'stamp';
+            editTools.stamp.element.style.display = 'block';
+        } else if (target.id === 'eraseTool') {
+            editTools.cTool = 'erase';
+            editTools.stamp.element.style.display = 'none';
+        }
+        if (selectedTool) selectedTool.classList.remove('selectedTool');
+        target.classList.add('selectedTool');
+    }
 });
-
-document.getElementById('eraseTool').addEventListener('click', function () {
-    editTools.cTool = 'erase';
-    editTools.stamp.element.style.display = 'none';
-});
-
 
 function save () {
     socket.emit('saveMap', world.tiles);
