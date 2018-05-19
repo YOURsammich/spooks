@@ -147,7 +147,7 @@ function createChannel (io, channelName) {
                     nick : user.nick
                 });
             }).fail(function () {
-                //showMessage(user.socket, 'Stop spamming', 'error');
+                showMessage(user.socket, 'Stop spamming', 'error');
             });
         });
         
