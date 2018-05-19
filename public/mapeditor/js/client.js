@@ -157,30 +157,28 @@ editTools.stamp.spreadDisplay = function (newX, newY) {
 }
 
 editTools.stamp.multiPlace = function (startX, startY, stopX, stopY) {
-    var stamp = editTools.stamp,
-        defY,
-        defX;
+    const stamp = editTools.stamp;
     
     if (stopX <= startX) {
-        let k = stopX;
+        const k = stopX;
         stopX = startX + stamp.maxX;
         startX = k;
     }
     
     if (stopY <= startY) {
-        let k = stopY;
+        const k = stopY;
         stopY = startY + stamp.maxY;
         startY = k;
     }
         
     for (moveX = startX; moveX < stopX; moveX += stamp.maxX) {
+        let defY;
+        let defX;
         for (moveY = startY; moveY < stopY; moveY += stamp.maxY) {
             if (moveY + stamp.maxY > stopY) defY = stopY - moveY;
             if (moveX + stamp.maxX > stopX) defX = stopX - moveX;            
             editTools.stamp.groupPlace(moveX, moveY, stamp.minX, stamp.minY, defX || stamp.maxX, defY || stamp.maxY);   
         }
-        defY = null;
-        defX = null;
     }
 }
 
@@ -227,11 +225,8 @@ editTools.stamp.mousemove = function (e, x, y) {
 editTools.erase = {};
 
 editTools.erase.clearCell = function (layer, X, Y) {
-    var index = editTools.getCell(layer, X * 16, Y * 16);
-    console.log(index, layer, X * 16, Y * 16)
-    if (index !== -1) {
-        world.tiles[layer][index[0]].splice(index[1], 1);
-    }
+    const index = editTools.getCell(layer, X * 16, Y * 16);
+    if (index !== -1) world.tiles[layer][index[0]].splice(index[1], 1);
 }
 
 editTools.erase.spreadDisplay = function (startX, startY, endX, endY) {
@@ -245,23 +240,21 @@ editTools.erase.spreadDisplay = function (startX, startY, endX, endY) {
 
 editTools.erase.groupErase = function (layer, startX, startY, endX, endY) {
     if (startX >= endX) {
-        let cX = endX;
+        const cX = endX;
         endX = ++startX;
         startX = cX;
     }
     
     if (startY >= endY) {
-        let cY = endY;
+        const cY = endY;
         endY = ++startY;
         startY = cY;
     }
 
     for (let x = startX; x < endX; x++) {
         for (let y = startY; y < endY; y++) {
-            let index = editTools.getCell(layer, x * 16, y * 16);
-            if (index !== -1) {
-                world.tiles[layer][index[0]].splice(index[1], 1);
-            }
+            const index = editTools.getCell(layer, x * 16, y * 16);
+            if (index !== -1) world.tiles[layer][index[0]].splice(index[1], 1);
         }
     }
     
@@ -269,30 +262,33 @@ editTools.erase.groupErase = function (layer, startX, startY, endX, endY) {
 }
 
 editTools.erase.mousedown = function (e, x, y) {
-    if (this.display) {
-        this.groupErase(world.activeLayer.layerNumber, this.x, this.y, ++x, ++y);
-        this.display = false;
+    const erase = editTools.erase;
+    if (erase.display) {
+        erase.groupErase(world.activeLayer.layerNumber, erase.x, erase.y, ++x, ++y);
+        erase.display = false;
     } else if (e.shiftKey) {
-        this.x = x;
-        this.y = y;
-        this.display = true; 
+        erase.x = x;
+        erase.y = y;
+        erase.display = true; 
     } else {
-        this.clearCell(world.activeLayer.layerNumber, x, y);
+        erase.clearCell(world.activeLayer.layerNumber, x, y);
         world.drawMap(world.activeLayer.layerNumber);
     }
 }
 
 editTools.erase.keyup = function (e) {
     if (!e.shiftKey) {
-        this.display = false;
+        const erase = editTools.erase;
+        erase.display = false;
         world.drawMap(world.activeLayer.layerNumber);
     }
 }
 
 editTools.erase.mousemove = function (e, x, y) {
-    if (this.display) {
+    const erase = editTools.erase;
+    if (erase.display) {
         world.drawMap(world.activeLayer.layerNumber);
-        this.spreadDisplay(this.x * 16, this.y * 16, ++x * 16, ++y * 16);
+        erase.spreadDisplay(erase.x * 16, erase.y * 16, ++x * 16, ++y * 16);
     }
 }
 
@@ -301,28 +297,26 @@ editTools.erase.mousemove = function (e, x, y) {
 // --------------------------------------------
 
 document.getElementById('tileSetSheets').addEventListener('mousedown', function (e) {
-    var X = Math.floor(e.layerX / 16),
-        Y = Math.floor(e.layerY / 16),
-        stamp = editTools.stamp;
+    const stamp = editTools.stamp;
     
-    stamp.minX = X;
-    stamp.minY = Y;
+    stamp.minX = Math.floor(e.layerX / 16);
+    stamp.minY = Math.floor(e.layerY / 16);
     stamp.selecting = true;
 });
 
 document.getElementById('tileSetSheets').addEventListener('mouseup', function (e) {
-    var X = Math.floor((e.layerX + 16) / 16),
-        Y = Math.floor((e.layerY + 16) / 16),
-        stamp = editTools.stamp;
+    const stamp = editTools.stamp;
+    let X = Math.floor((e.layerX + 16) / 16);
+    let Y = Math.floor((e.layerY + 16) / 16);
     
     if (X <= stamp.minX) {
-        let cX = ++stamp.minX;
+        const cX = ++stamp.minX;
         stamp.minX = --X;
         X = cX;
     }
     
     if (Y <= stamp.minY) {
-        let cY = ++stamp.minY;
+        const cY = ++stamp.minY;
         stamp.minY = --Y;
         Y = cY;
     }
@@ -334,22 +328,21 @@ document.getElementById('tileSetSheets').addEventListener('mouseup', function (e
 });
 
 document.getElementById('tileSetSheets').addEventListener('mousemove', function (e) {
-    var X = Math.floor((e.layerX) / 16) + 1,
-        Y = Math.floor((e.layerY) / 16) + 1,
-        stamp = editTools.stamp,
-        startX = stamp.minX,
-        startY = stamp.minY;
+    const stamp = editTools.stamp;
+    let X = Math.floor((e.layerX) / 16) + 1;
+    let Y = Math.floor((e.layerY) / 16) + 1;
+    let startX = stamp.minX;
+    let = stamp.minY;
         
     if (stamp.selecting) {
-        
         if (X <= startX) {
-            let cX = ++startX;
+            const cX = ++startX;
             startX = --X;
             X = cX;
         }
         
         if (Y <= startY) {
-            let cY = ++startY;
+            const cY = ++startY;
             startY = --Y;
             Y = cY;
         }
@@ -411,14 +404,14 @@ document.getElementById('addLayer').addEventListener('click', world.addLayer);
 // ------------------------------------------
 
 document.body.addEventListener('keydown', function (e) {
-    var keyCode = e.which;
+    const keyCode = e.which;
     
     if (e.ctrlKey) {
         if (keyCode == 90) {
             editTools.undo();
         } else if (keyCode == 71) {
             e.preventDefault();
-            let bgGrid = document.getElementById('bgGrid');
+            const bgGrid = document.getElementById('bgGrid');
             if (!bgGrid.style.display || bgGrid.style.display === 'block') { 
                 bgGrid.style.display = 'none';
             } else {
