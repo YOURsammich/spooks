@@ -9,24 +9,27 @@
         <wrap>
             
             <toolbar>
-                <div id="systemToolbar">
-                    <span>File</span>
-                    <span>Edit</span>
-                    <span>View</span>
-                    <span>Map</span>
-                    <span>Layer</span>
-                    <span>Help</span>
+                <ul id="systemToolbar">
+                    <li>File</li>
+                    <li>Edit</li>
+                    <li>View</li>
+                    <li>Map</li>
+                    <li>Layer</li>
+                    <li>Help</li>
+                    <li id="map-status">All changes saved</li>
+                </ul>
+                <div id="editor-bar">
+                    <ul id="mapSettings">
+                        <li class="toolIcon"><span class="newMap"></span></li>
+                        <li class="toolIcon"><span class="openMap"></span></li>
+                        <li id="saveMap" class="toolIcon"><span class="saveMap"></span></li>
+                    </ul>
+                    <div class="divider"></div>
+                    <ul id="mapTools">
+                        <li id="stampTool" class="toolIcon selectedTool"><span class="stampMap mapTool"></span></li>
+                        <li id="eraseTool" class="toolIcon"><span class="eraserMap mapTool"></span></li>
+                    </ul>
                 </div>
-                <ul id="mapSettings">
-                    <li class="toolIcon"><span class="newMap"></span></li>
-                    <li class="toolIcon"><span class="openMap"></span></li>
-                    <li class="toolIcon"><span class="saveMap"></span></li>
-                </ul>
-                <div class="divider"></div>
-                <ul id="mapTools">
-                    <li id="stampTool" class="toolIcon selectedTool"><span class="stampMap mapTool"></span></li>
-                    <li id="eraseTool" class="toolIcon"><span class="eraserMap mapTool"></span></li>
-                </ul>
             </toolbar>
             
             <main>

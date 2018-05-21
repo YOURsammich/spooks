@@ -27,13 +27,16 @@ toolbar {
 }
 
 toolbar ul {
-    display: inline-block;
     margin: 0;
     padding: 3px;
 }
 
-toolbar span {
-    margin: 2px 7px;
+toolbar li {
+    display: inline-block;
+}
+
+toolbar li:hover {
+    background-color: #82b1ff;
 }
 
 .selectedTool {
@@ -41,22 +44,40 @@ toolbar span {
     border: 1px solid #aaa;
 }
 
-toolbar li:hover {
-    background-color: #82b1ff;
-}
-
 #systemToolbar {
     background-color: #eee;
     padding: 1px;
     border-bottom: 1px solid #ccc;
-    font-size: small;
+    font-size: 14px;
     cursor: default;
 }
 
-#systemToolbar span {
+.unsaved {
+    font-size: 0;
+}
+
+.unsaved:before {
+    content: '* Changes not saved *';
+    font-size: 14px;
+}
+
+#map-status {
+    margin-left: 20px;
+}
+
+#systemToolbar li {
     padding: 2px 4px 2px 4px;
+}
+
+#editor-bar ul {
     display: inline-block;
 }
+
+#editor-bar span {
+    margin: 2px 7px;
+}
+
+/* stamp for show selected tiles */
 
 #stamp {
     position: absolute;

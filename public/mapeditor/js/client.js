@@ -101,6 +101,8 @@ editTools.stamp.placeCell = function (layer, tileSheetId, X, Y, imgX, imgY) {
         imgX,
         imgY
     ]); 
+    
+    document.getElementById('map-status').classList.add('unsaved');
 }
 
 editTools.stamp.groupPlace = function (startX, startY, minX, minY, maxX, maxY) {
@@ -447,6 +449,18 @@ document.getElementById('mapTools').addEventListener('click', function (e) {
     }
 });
 
+document.getElementById('mapSettings').addEventListener('click', function (e) {
+    let target = e.target;
+    
+    if (target.parentElement.nodeName === 'LI') target = target.parentElement;
+    
+    if (target.nodeName === 'LI') {
+        const unsavedStatus = document.getElementsByClassName('unsaved')[0];
+        if (unsavedStatus) unsavedStatus.classList.remove('unsaved'); 
+        socket.emit('saveMap', world.tiles);
+    }
+});
+
 function save () {
-    socket.emit('saveMap', world.tiles);
+    console.error('Click the floppy disk button :) (MAP NOT SAVED)');
 }
