@@ -43,12 +43,16 @@ world.addTilesheet = function (url) {
     tab.textContent = url;
     tab.addEventListener('click', function () {
         const tileSheets = tileSheetCon.getElementsByClassName('tileSheetCanvas');
+        const selectedTab = document.getElementsByClassName('selectedTab')[0];
         highLightCan.width = img.width;
         highLightCan.height = img.height;
         
         for (let tileSheet of tileSheets) tileSheet.style.display = 'none';
         
         canvas.style.display = 'block';
+        
+        if (selectedTab) selectedTab.classList.remove('selectedTab');
+        
         tab.className = 'selectedTab';
         world.activeTileSheet = {canvas, ctx};
     });
@@ -94,7 +98,7 @@ world.addTilesheet = function (url) {
 }
 
 world.loadTileSheets = function () {
-    const acceptedTileSheets = ['Tileset.png', 'Snow.png'];
+    const acceptedTileSheets = ['Tileset.png', 'Snow.png', 'indoors.png', 'caves.png'];
 
     for (let tileSheet of acceptedTileSheets) {
         world.addTilesheet(tileSheet);

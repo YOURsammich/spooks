@@ -332,7 +332,7 @@ document.getElementById('tileSetSheets').addEventListener('mousemove', function 
     let X = Math.floor((e.layerX) / 16) + 1;
     let Y = Math.floor((e.layerY) / 16) + 1;
     let startX = stamp.minX;
-    let = stamp.minY;
+    let startY = stamp.minY;
         
     if (stamp.selecting) {
         if (X <= startX) {
