@@ -33,6 +33,7 @@ toolbar ul {
 
 toolbar li {
     display: inline-block;
+    list-style-type: none;
 }
 
 toolbar li:hover {
@@ -92,12 +93,6 @@ toolbar li:hover {
 /* tool icons */
 
 .toolIcon {
-    display: inline-block;
-    list-style-type: none;
-    display: inline-block;
-}
-
-.toolIcon span {
     background-repeat: no-repeat;
     background-image: url(../img/MapEditorTools.png);
     display: block;
@@ -129,6 +124,10 @@ toolbar li:hover {
 
 .eraserMap {
     background-position: -64px 0px;
+}
+
+.deleteMap {
+    background-position: -32px -96px;
 }
 
 /* MAIN */
@@ -169,11 +168,24 @@ main header {
 }
 
 #tileLayers li {
-    text-align: center;
     border: 1px solid #999;
     background-color: #aaa;
     margin-bottom: 5px;
+    padding: 6px 0px;
     cursor: pointer;
+    text-align: center;
+    position: relative;
+}
+
+#tileLayers i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #tileLayers .selected {

@@ -98,10 +98,10 @@ world.addTilesheet = function (url) {
 }
 
 world.loadTileSheets = function () {
-    const acceptedTileSheets = ['Tileset.png', 'Snow.png', 'indoors.png', 'caves.png'];
+    const acceptedTileSheets = ['caves', 'House', 'House2', 'House3', 'House4', 'indoors', 'leaves', 'Moon', 'sand', 'shop', 'Snow', 'special', 'Tileset', 'TransparentTiles'];
 
     for (let tileSheet of acceptedTileSheets) {
-        world.addTilesheet(tileSheet);
+        world.addTilesheet(tileSheet + '.png');
     }
 }
 
@@ -109,22 +109,31 @@ world.addLayer = function () {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const mapArea = document.getElementById('mapArea');
-    const selectLayer = document.createElement('li');
     const layerNumber = world.layers.length;
+    const selectLayer = document.createElement('li');
+    const layerName = document.createTextNode('Layer ' + (layerNumber + 1))
+    const menuArrow = document.createElement('i');
     const tileLayers = document.getElementById('tileLayers');
     const bgGrid = document.getElementById('bgGrid');
     
     canvas.width = canvas.height = 2000;
     world.layers.push({canvas, ctx});
     mapArea.insertBefore(canvas, document.getElementById('stamp'));
-    selectLayer.textContent = 'Layer ' + world.layers.length;;
+    menuArrow.className = 'fas fa-chevron-down';    
+    selectLayer.appendChild(menuArrow);
+    selectLayer.appendChild(layerName);
     
-    selectLayer.addEventListener('click', function () {
-        document.getElementById('mapArea').insertBefore(bgGrid, canvas.nextElementSibling);
+    selectLayer.addEventListener('click', function (e) {
+        var target = e.target;
         
-        world.activeLayer = {layerNumber, canvas, ctx};
-        document.getElementsByClassName('selected')[0].className = '';
-        selectLayer.className = 'selected';
+        if (target === menuArrow) {
+            console.log('test');
+        } else {
+            document.getElementById('mapArea').insertBefore(bgGrid, canvas.nextElementSibling);
+            world.activeLayer = {layerNumber, canvas, ctx};
+            document.getElementsByClassName('selected')[0].className = '';
+            selectLayer.className = 'selected';   
+        }
     });
     
     if (layerNumber === 0) {
